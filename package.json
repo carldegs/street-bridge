@@ -3,26 +3,53 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "@reduxjs/toolkit": "^1.3.6",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
+    "@testing-library/react-hooks": "^3.3.0",
     "@testing-library/user-event": "^7.1.2",
+    "@types/classnames": "^2.2.10",
+    "@types/hapi__joi": "^17.1.2",
     "@types/jest": "^24.0.0",
+    "@types/lodash": "^4.14.155",
     "@types/node": "^12.0.0",
-    "@types/react": "^16.9.0",
-    "@types/react-dom": "^16.9.0",
+    "@types/react": "^16.9.35",
+    "@types/react-bootstrap": "^1.0.1",
+    "@types/react-dom": "^16.9.8",
+    "@types/react-router-dom": "^5.1.5",
+    "bootstrap": "^4.5.0",
+    "casual": "^1.6.2",
+    "classnames": "^2.2.6",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "firebase": "^7.17.2",
+    "history": "^5.0.0",
+    "lodash": "^4.17.15",
+    "moment": "^2.27.0",
+    "node-sass": "^4.14.1",
     "react": "^16.13.1",
+    "react-bootstrap": "^1.0.1",
+    "react-csv": "^2.0.3",
     "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
     "typescript": "~3.7.2"
   },
   "scripts": {
+    "lint": "eslint src/**/*.ts src/**/*.tsx",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --env=jsdom-fourteen",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run lint"
+    }
   },
   "browserslist": {
     "production": [
@@ -35,5 +62,17 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^3.1.0",
+    "@typescript-eslint/parser": "^3.1.0",
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-react": "^7.20.0",
+    "husky": "^4.2.5",
+    "jest-environment-jsdom-fourteen": "^1.0.1",
+    "prettier": "^2.0.5"
   }
 }
