@@ -110,6 +110,7 @@ class Firebase {
               value: 1,
             },
             cards: [],
+            isHost: true,
           },
         },
         phase: Phase.lobby,
@@ -140,6 +141,7 @@ class Firebase {
             value: 1,
           },
           cards: [],
+          isHost: false,
         },
       });
       return res;
@@ -149,6 +151,7 @@ class Firebase {
   };
 
   leaveGame = async (gameId: string, username: string) => {
+    // TODO: Set new host if host left the game.
     try {
       const res = await this.games.doc(gameId).update({
         players: app.firestore.FieldValue.arrayRemove(username),
@@ -162,6 +165,7 @@ class Firebase {
   };
 
   startBidding = async (gameId: string) => {
+    // TODO: Convert to a transaction
     try {
       const deck = createSplitDeck();
       const getGame = await this.games.doc(gameId).get();
@@ -187,16 +191,19 @@ class Firebase {
         info => info.team !== firstPlayer.team
       );
       const newPlayers = [
-        firstPlayer.username,
-        opposingTeamPlayers[0].username,
-        firstPlayerTeamMate.username,
-        opposingTeamPlayers[1].username,
+        firstPlayer,
+        opposingTeamPlayers[0],
+        firstPlayerTeamMate,
+        opposingTeamPlayers[1],
       ];
 
       const res = await this.games.doc(gameId).update({
         ...cards,
         phase: Phase.bid,
-        players: newPlayers,
+        players: newPlayers.map(player => player.username),
+        ...(!newPlayers.some(player => player.isHost) && {
+          [`playerInfo.${players[0]}.isHost`]: true,
+        }),
       } as Partial<Game>);
 
       return res;

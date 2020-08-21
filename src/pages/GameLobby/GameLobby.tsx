@@ -19,6 +19,7 @@ import { Phase } from '../../models';
 
 import styles from './GameLobby.module.scss';
 
+// TODO: Change how the host is determined
 const GameLobby: React.FC = () => {
   const history = useHistory();
   const firebase = useFirebase();

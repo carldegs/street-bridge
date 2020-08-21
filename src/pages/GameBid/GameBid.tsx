@@ -1,7 +1,7 @@
 /* eslint-disable no-shadow */
 import React, { useEffect, useMemo, useState } from 'react';
 import cx from 'classnames';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Row, Col } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { range, sortBy } from 'lodash';
@@ -87,6 +87,22 @@ const GameBid: React.FC = () => {
       return sortBy(unsortedCards, ['suit', 'value']);
     }
     return [];
+  }, [game, authUser]);
+
+  const isAuthUserAPlayer = useMemo(() => {
+    return !!(
+      game?.playerInfo &&
+      authUser?.displayName &&
+      game?.playerInfo[authUser.displayName]
+    );
+  }, [game, authUser]);
+
+  const isAuthUserAHost = useMemo(() => {
+    return !!(
+      game?.playerInfo &&
+      authUser?.displayName &&
+      game?.playerInfo[authUser.displayName]?.isHost
+    );
   }, [game, authUser]);
 
   useEffect(() => {
@@ -264,6 +280,29 @@ const GameBid: React.FC = () => {
         </Col>
       </Row>
       <Cards cards={cards} />
+      <Row style={{ width: '100%' }}>
+        <Col className="d-flex align-items-center mt-3 ml-3">
+          {!isAuthUserAPlayer && (
+            <Link to="/home">
+              <SBButton outline color="cyan">
+                BACK TO LOBBY
+              </SBButton>
+            </Link>
+          )}
+          {isAuthUserAHost && (
+            <SBButton
+              outline
+              color="red"
+              onClick={() => {
+                firebase.deleteGame(id);
+              }}
+              className="mt-3"
+            >
+              STOP GAME
+            </SBButton>
+          )}
+        </Col>
+      </Row>
     </div>
   );
 };

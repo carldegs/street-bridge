@@ -42,6 +42,7 @@ export interface PlayerInfo {
   team: number;
   bid: Bid;
   cards: Card[];
+  isHost: boolean;
 }
 
 export interface Game {
