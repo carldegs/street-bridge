@@ -4,10 +4,16 @@ import './App.scss';
 import Router from './Router/Router';
 import { FirebaseProvider } from './firebase/useFirebase';
 import ROOT_ROUTES from './pages/rootRoutes';
+import { StateProvider } from './store/store';
+import setupFALibrary from './utils/setupFontAwesome';
+
+setupFALibrary();
 
 const App: React.FC = () => (
   <FirebaseProvider>
-    <Router rootRoutes={ROOT_ROUTES} />
+    <StateProvider>
+      <Router rootRoutes={ROOT_ROUTES} />
+    </StateProvider>
   </FirebaseProvider>
 );
 

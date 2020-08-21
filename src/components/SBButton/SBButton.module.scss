@@ -1,0 +1,129 @@
+@import '../../scss/constants.scss';
+
+.SBButton {
+  padding: 8px 16px;
+  border-radius: 16px;
+  border: 1px solid $dark1;
+  background-color: $dark1;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  line-height: 1.5;
+  width: fit-content;
+  color: $light;
+
+  &.disabled {
+    opacity: 0.3;
+
+    &:hover {
+      background-color: inherit !important;
+      border-color: inherit !important;
+    }
+  }
+
+  &:hover {
+    background-color: $blue;
+    border-color: $blue;
+  }
+
+  &.outline {
+    border-color: $dark1;
+    background-color: transparent;
+
+    &:hover {
+      background-color: $dark1;
+      color: $light !important;
+    }
+
+    &.darkText {
+      color: $dark1;
+    }
+
+    &.red {
+      border-color: $red;
+
+      &:hover {
+        background-color: $red;
+        color: $light;
+      }
+    }
+
+    &.purple {
+      border-color: $purple;
+
+      &:hover {
+        background-color: $purple;
+        color: $light;
+      }
+    }
+
+    &.blue {
+      border-color: $blue;
+
+      &:hover {
+        background-color: $blue;
+        color: $light;
+      }
+    }
+
+    &.yellow {
+      border-color: $yellow;
+
+      &:hover {
+        background-color: $yellow;
+        color: $light;
+      }
+    }
+
+    &.green {
+      border-color: $green;
+
+      &:hover {
+        background-color: $green;
+        color: $light;
+      }
+    }
+
+    &.cyan {
+      border-color: $cyan;
+
+      &:hover {
+        background-color: $cyan;
+        color: $light;
+      }
+    }
+
+    &.white {
+      border-color: $light;
+
+      &:hover {
+        background-color: $light;
+        color: $dark1 !important;
+      }
+    }
+  }
+
+  &.red:not(.outline) {
+    border-color: $red;
+  }
+
+  &.purple:not(.outline) {
+    background-color: $purple;
+  }
+
+  &.blue:not(.outline) {
+    background-color: $blue;
+  }
+
+  &.yellow:not(.outline) {
+    background-color: $yellow;
+  }
+
+  &.green:not(.outline) {
+    background-color: $green;
+  }
+
+  &.cyan:not(.outline) {
+    background-color: $cyan;
+  }
+}

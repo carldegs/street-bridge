@@ -1,8 +1,43 @@
+
+@import './constants.scss';
 /* import only the necessary Bootstrap files */
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
 
-/* ADD CHANGES HERE */
+$font-family-base: $sans;
+$body-color: $light;
+
+$border-radius: 0.2rem;
+$border-radius-lg: 0.2rem;
+
+$navbar-padding: 0.25rem 1rem;
+
+$btn-padding-y: 8px;
+$btn-padding-x: 12px;
+$btn-border-radius: 0.2rem;
+$btn-border-radius-lg: 0.2rem;
+
+body {
+  background: linear-gradient(
+    135deg,
+    rgba(27, 25, 36, 1) 0%,
+    rgba(29, 21, 45, 1) 100%
+  ) !important;
+  background-color: transparent !important;
+}
+
+.form-control {
+  background-color: transparent !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-top: 0 !important;
+  border-radius: 0 !important;
+}
+
+label {
+  color: $dark2;
+  opacity: 0.8;
+}
 
 /* Importing bootstrap scss should be last */
 @import '~bootstrap/scss/bootstrap';

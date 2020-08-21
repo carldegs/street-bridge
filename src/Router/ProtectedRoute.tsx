@@ -5,6 +5,8 @@ import { Redirect, Route } from 'react-router-dom';
 import startCase from 'lodash/startCase';
 import camelCase from 'lodash/camelCase';
 
+import SBNavbar from '../components/SBNavbar/SBNavbar';
+
 import { RouteObject } from './model';
 
 interface ITitlePage {
@@ -35,6 +37,7 @@ const ProtectedRoute: React.FC<IProtectedRoute> = ({
   isAuthenticated = false,
   isPublic,
   hideOnAuth,
+  hideNavbar,
 }: IProtectedRoute) => {
   const hasValidRole = true; // TODO: create role checker
   const showComponent =
@@ -63,12 +66,23 @@ const ProtectedRoute: React.FC<IProtectedRoute> = ({
       exact={exact}
       render={props => (
         <TitlePage title={title || startCase(camelCase(name))}>
-          <Component
-            {...props}
-            routes={routes}
-            name={name}
-            isAuthenticated={isAuthenticated}
-          />
+          {hideNavbar ? (
+            <Component
+              {...props}
+              routes={routes}
+              name={name}
+              isAuthenticated={isAuthenticated}
+            />
+          ) : (
+            <SBNavbar title={title}>
+              <Component
+                {...props}
+                routes={routes}
+                name={name}
+                isAuthenticated={isAuthenticated}
+              />
+            </SBNavbar>
+          )}
         </TitlePage>
       )}
     />

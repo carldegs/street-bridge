@@ -1,0 +1,83 @@
+@import '../../scss/constants.scss';
+
+.GameLobby {
+  padding: 32px;
+
+  .title {
+    display: flex;
+    justify-content: center;
+
+    .gameName {
+      font-family: IBM Plex Sans;
+      font-style: italic;
+      font-weight: bold;
+      font-size: 24px;
+      color: $light;
+      letter-spacing: -0.06em;
+      margin-right: 24px;
+    }
+
+    .phase {
+      font-family: IBM Plex Serif;
+      font-style: italic;
+      font-weight: bold;
+      font-size: 24px;
+      color: $red;
+      letter-spacing: -0.06em;
+    }
+  }
+
+  .left {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .right {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    .teamA,
+    .teamB {
+      display: flex;
+      flex-direction: column;
+      padding: 48px;
+      height: fit-content;
+    }
+
+    .teamA {
+      border-radius: 64px 64px 0px 64px;
+      background-color: $red;
+      text-align: right;
+      align-items: flex-end;
+    }
+
+    .teamB {
+      border-radius: 0px 64px 64px 64px;
+      flex-direction: column-reverse;
+      background-color: $blue;
+      margin-top: 186px;
+    }
+
+    .teamTitle {
+      font-family: IBM Plex Serif;
+      font-style: italic;
+      font-weight: bold;
+      font-size: 32px;
+      letter-spacing: -0.06em;
+    }
+
+    .players {
+      margin: 24px 0;
+
+      p {
+        font-family: IBM Plex Sans;
+        font-style: italic;
+        font-weight: bold;
+        font-size: 24px;
+        line-height: 31px;
+        letter-spacing: -0.06em;
+      }
+    }
+  }
+}

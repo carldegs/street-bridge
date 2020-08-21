@@ -1,0 +1,68 @@
+@import '../../scss/constants.scss';
+
+.Home {
+  display: flex;
+  // align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  height: calc(100% - 12px);
+
+  .content {
+    min-width: 712px;
+    max-width: 712px;
+  }
+}
+
+.game {
+  margin-top: 24px;
+
+  .gameHeader {
+    padding: 12px 16px 24px 16px;
+    border-radius: 16px 16px 0px 0px;
+
+    &.red {
+      background-color: $red;
+    }
+
+    &.purple {
+      background-color: $purple;
+    }
+
+    &.blue {
+      background-color: $blue;
+    }
+
+    &.yellow {
+      background-color: $yellow;
+    }
+
+    &.green {
+      background-color: $green;
+    }
+
+    &.cyan {
+      background-color: $cyan;
+    }
+
+    .gameTitle {
+      font-family: 'IBM Plex Sans';
+      font-style: italic;
+      font-weight: bold;
+      font-size: 24px;
+      letter-spacing: -0.06em;
+    }
+
+    .gameInfo {
+      display: flex;
+    }
+  }
+
+  .gameActions {
+    display: flex;
+    padding: 12px 16px;
+    background-color: $light;
+    width: 100%;
+    border-radius: 0px 0px 16px 16px;
+    justify-content: flex-end;
+  }
+}

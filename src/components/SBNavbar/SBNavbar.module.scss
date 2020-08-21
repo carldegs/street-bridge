@@ -1,0 +1,49 @@
+@import '../../scss/constants.scss';
+
+.SBNavbar {
+  padding: 0 16px;
+  height: 82px;
+  width: 100%;
+
+  .logo {
+    .street {
+      font-size: 38px;
+      font-family: 'IBM Plex Sans';
+      font-style: italic;
+      font-weight: bold;
+    }
+
+    .bridge {
+      font-size: 45px;
+      font-family: 'IBM Plex Serif';
+      font-style: italic;
+      font-weight: bold;
+      color: $red;
+      margin-top: -42px;
+      margin-left: 18px;
+    }
+  }
+
+  .pageTitle {
+    font-size: 24px;
+    font-family: 'IBM Plex Sans';
+    font-weight: bold;
+    font-style: italic;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logout {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+}
+
+.children {
+  width: 100%;
+  height: calc(100vh - 82px);
+  overflow-y: auto;
+}

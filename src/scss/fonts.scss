@@ -1,5 +1,25 @@
 @font-face {
-  font-family: 'Teko';
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 300;
+  src: url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300&display=swap');
+}
+@font-face {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 400;
+  src: url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400&display=swap');
+}
+@font-face {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 600;
+  src: url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@600&display=swap');
+}
+@font-face {
+  font-family: 'IBM Plex Sans', sans-serif;
   font-weight: 700;
-  src: url('https://fonts.googleapis.com/css2?family=Teko:wght@700&display=swap');
+  src: url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@700&display=swap');
+}
+@font-face {
+  font-family: 'IBM Plex Serif', serif;
+  font-weight: 700;
+  src: url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@1,700&display=swap');
 }
