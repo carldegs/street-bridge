@@ -33,6 +33,10 @@ export interface Bid {
   value: number;
 }
 
+export interface PlayerBid extends Bid {
+  username: string;
+}
+
 export interface PlayerInfo {
   username: string;
   team: number;
@@ -49,4 +53,5 @@ export interface Game {
   winTeam: number | null;
   currPlayer: number;
   score: [number, number];
+  bids: Record<number, PlayerBid>;
 }

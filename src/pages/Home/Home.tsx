@@ -35,7 +35,7 @@ const Home: React.FC = () => {
     });
 
     if (gameId) {
-      history.push(`/game/${gameId}`);
+      history.push(`/game/lobby/${gameId}`);
     }
   }, [games, history]);
 
@@ -95,7 +95,9 @@ const Home: React.FC = () => {
                 >
                   DELETE
                 </SBButton>
-                <SBButton onClick={() => history.push(`/game/${game.id}`)}>
+                <SBButton
+                  onClick={() => history.push(`/game/lobby/${game.id}`)}
+                >
                   JOIN
                 </SBButton>
               </div>

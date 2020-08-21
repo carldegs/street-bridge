@@ -3,7 +3,7 @@
 .SBButton {
   padding: 8px 16px;
   border-radius: 16px;
-  border: 1px solid $dark1;
+  border: 1.5px solid $dark1;
   background-color: $dark1;
   cursor: pointer;
   letter-spacing: 0.06em;
@@ -105,25 +105,37 @@
 
   &.red:not(.outline) {
     border-color: $red;
+    background-color: $red;
   }
 
   &.purple:not(.outline) {
+    border-color: $purple;
     background-color: $purple;
   }
 
   &.blue:not(.outline) {
+    border-color: $blue;
     background-color: $blue;
   }
 
   &.yellow:not(.outline) {
+    border-color: $yellow;
     background-color: $yellow;
   }
 
   &.green:not(.outline) {
+    border-color: $green;
     background-color: $green;
   }
 
   &.cyan:not(.outline) {
+    border-color: $cyan;
     background-color: $cyan;
+  }
+
+  &.white:not(.outline) {
+    border-color: $light;
+    background-color: $light;
+    color: $dark1
   }
 }
