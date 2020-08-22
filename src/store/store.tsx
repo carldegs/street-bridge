@@ -10,21 +10,25 @@ export interface GameState {
 interface State {
   authUser: firebase.User;
   games: GameState[];
+  isFetchingAuthUser: boolean;
 }
 
 const initialState: State = {
   authUser: {} as firebase.User,
   games: [] as GameState[],
+  isFetchingAuthUser: false,
 };
 
 export enum ActionType {
   setAuthUser = 1,
+  setFetchingAuthUser,
   setGames,
 }
 
 type Action =
   | [ActionType.setAuthUser, State['authUser'] | null]
-  | [ActionType.setGames, GameState[]];
+  | [ActionType.setGames, GameState[]]
+  | [ActionType.setFetchingAuthUser, boolean];
 
 export const store = createContext({
   state: initialState,
@@ -47,6 +51,11 @@ export const StateProvider: React.FC = props => {
           return {
             ...s,
             games: payload || ([] as GameState[]),
+          };
+        case ActionType.setFetchingAuthUser:
+          return {
+            ...s,
+            isFetchingAuthUser: payload,
           };
         default:
           return s;

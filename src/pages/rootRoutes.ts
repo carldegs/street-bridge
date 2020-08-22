@@ -39,6 +39,11 @@ const ROOT_ROUTES: RouteObject[] = [
     name: 'Bidding',
     component: GameBid,
   },
+  {
+    path: '/game/play/:id',
+    name: 'Gameplay',
+    component: GameBid,
+  },
 ];
 
 export default ROOT_ROUTES;
