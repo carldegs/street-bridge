@@ -4,6 +4,7 @@ import Landing from './Landing/Landing';
 import Home from './Home/Home';
 import Signup from './Signup/Signup';
 import GameLobby from './GameLobby/GameLobby';
+import GameBid from './GameBid/GameBid';
 
 const ROOT_ROUTES: RouteObject[] = [
   {
@@ -29,9 +30,14 @@ const ROOT_ROUTES: RouteObject[] = [
     hideNavbar: true,
   },
   {
-    path: '/game/:id',
+    path: '/game/lobby/:id',
     name: 'Game Lobby',
     component: GameLobby,
+  },
+  {
+    path: '/game/bid/:id',
+    name: 'Bidding',
+    component: GameBid,
   },
 ];
 

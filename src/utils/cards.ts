@@ -1,6 +1,6 @@
 import { shuffle, chunk } from 'lodash';
 
-import { CardSuit, Card } from '../models';
+import { CardSuit, Card, BidSuit } from '../models';
 
 export const createCard = (
   suit: CardSuit,
@@ -30,4 +30,45 @@ export const createSplitDeck = (): Card[][] => {
     });
 
   return chunk(shuffle(cards), 13);
+};
+
+export const getCardValue = (value: number): string => {
+  switch (value) {
+    case 0:
+      return 'A';
+    case 10:
+      return 'J';
+    case 11:
+      return 'Q';
+    case 12:
+      return 'K';
+    default:
+      return `${value + 1}`;
+  }
+};
+
+export const getSuitString = (
+  value: BidSuit | CardSuit
+): string | undefined => {
+  switch (value) {
+    case BidSuit.pass:
+      return 'PASS!';
+    case BidSuit.noTrump:
+      return 'NT';
+    case BidSuit.spade:
+    case CardSuit.spade:
+      return '♠';
+    case BidSuit.heart:
+    case CardSuit.heart:
+      return '♥';
+    case BidSuit.diamond:
+    case CardSuit.diamond:
+      return '♦';
+    case BidSuit.club:
+    case CardSuit.club:
+      return '♣';
+    case BidSuit.none:
+    default:
+      return undefined;
+  }
 };

@@ -7,7 +7,7 @@ import useForm, { IState } from '../../hooks/useForm';
 import { useFirebase } from '../../firebase/useFirebase';
 import FormInput from '../../components/FormInput/FormInput';
 
-import { useStore, ActionType, useDispatch } from '../../store/store';
+import { ActionType, useDispatch } from '../../store/store';
 
 import SBButton from '../../components/SBButton/SBButton';
 

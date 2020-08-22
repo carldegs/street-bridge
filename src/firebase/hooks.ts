@@ -57,6 +57,7 @@ export const useGame = (
     winTeam: null,
     currPlayer: 0,
     score: [0, 0],
+    bids: [],
   });
   const [error, setError] = useState('');
 

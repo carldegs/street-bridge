@@ -46,7 +46,7 @@ const Signup: React.FC = () => {
 
       history.push('/');
     },
-    [firebase, dispatch]
+    [firebase, history]
   );
 
   const {

@@ -1,8 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useHistory } from 'react-router-dom';
 
-import { Row, Col, Button, Badge, Modal } from 'react-bootstrap';
+import { Row, Col, Button, Badge, Modal, Container } from 'react-bootstrap';
 
 import { range } from 'lodash';
 
@@ -15,9 +15,13 @@ import { useGame } from '../../firebase/hooks';
 
 import SBButton from '../../components/SBButton/SBButton';
 
+import { Phase } from '../../models';
+
 import styles from './GameLobby.module.scss';
 
+// TODO: Change how the host is determined
 const GameLobby: React.FC = () => {
+  const history = useHistory();
   const firebase = useFirebase();
   const { id } = useParams();
   const { game, error: gameError } = useGame(id);
@@ -51,8 +55,14 @@ const GameLobby: React.FC = () => {
     return [[], []];
   }, [game]);
 
+  useEffect(() => {
+    if (game?.phase === Phase.bid) {
+      history.push(`/game/bid/${id}`);
+    }
+  }, [game, history, id]);
+
   return (
-    <div className={styles.GameLobby} data-testid="GameLobby">
+    <Container className={styles.GameLobby} data-testid="GameLobby">
       <Modal show={gameError === 'no-game'}>
         <Modal.Header>Game Deleted</Modal.Header>
         <Modal.Footer>
@@ -189,116 +199,7 @@ const GameLobby: React.FC = () => {
           </div>
         </Col>
       </Row>
-      {/* <Row>
-        <Col>
-          <h1>{`Game ${name || id}`}</h1>
-        </Col>
-        <Col>
-          <Button
-            onClick={() => {
-              firebase.logoutUser();
-            }}
-          >
-            Logout
-          </Button>
-        </Col>
-        <Col>
-          <Link to="/home">
-            <Button>Back to Lobby</Button>
-          </Link>
-        </Col>
-        <Col>
-          <Button
-            onClick={() => {
-              firebase.leaveGame(id, authUser?.displayName || '');
-            }}
-          >
-            Leave Game
-          </Button>
-        </Col>
-        {players[0] === authUser.displayName && (
-          <Col>
-            <Button
-              onClick={() => {
-                firebase.deleteGame(id);
-              }}
-            >
-              Delete Game
-            </Button>
-          </Col>
-        )}
-      </Row>
-      <Row>
-        <Col>
-          <h2>Team A</h2>
-          {teamAPlayers.map(username => (
-            <p key={username}>
-              {username}
-              {username === players[0] && (
-                <Badge variant="secondary">Host</Badge>
-              )}
-            </p>
-          ))}
-          {players?.length <= 4 &&
-            (!currUserGameInfo || currUserGameInfo.team === 1) && (
-              <Button
-                onClick={() => {
-                  const authUsername = authUser?.displayName || '';
-                  const user = !currUserGameInfo
-                    ? authUsername
-                    : currUserGameInfo.username;
-                  firebase.joinGame(id, user, 0);
-                }}
-              >
-                {!currUserGameInfo ? 'Join' : 'Switch'}
-              </Button>
-            )}
-        </Col>
-        <Col>
-          <h2>Team B</h2>
-
-          {teamBPlayers.map(username => (
-            <p key={username}>
-              {username}
-              {username === players[0] && (
-                <Badge variant="secondary">Host</Badge>
-              )}
-            </p>
-          ))}
-
-          {players?.length <= 4 &&
-            (!currUserGameInfo || currUserGameInfo.team === 0) && (
-              <Button
-                onClick={() => {
-                  const authUsername = authUser?.displayName || '';
-                  const user = !currUserGameInfo
-                    ? authUsername
-                    : currUserGameInfo.username;
-                  firebase.joinGame(id, user, 1);
-                }}
-              >
-                {!currUserGameInfo ? 'Join' : 'Switch'}
-              </Button>
-            )}
-        </Col>
-      </Row>
-      <Row>
-        {players[0] === authUser.displayName && (
-          <Col>
-            <Button
-              block
-              disabled={
-                players.length !== 4 ||
-                teamAPlayers.length !== teamBPlayers.length
-              }
-              onClick={() => firebase.startBidding(id)}
-            >
-              Start Game
-            </Button>
-          </Col>
-        )}
-      </Row> */}
-    </div>
+    </Container>
   );
 };
 
