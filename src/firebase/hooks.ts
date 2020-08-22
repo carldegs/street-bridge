@@ -4,9 +4,9 @@ import { store, GameState } from '../store/store';
 
 import { Game, Phase } from '../models';
 
-import FirebaseContext from './useFirebase';
+import { useAuth } from '../store/useAuth';
 
-export const xyagadgea = 'x';
+import FirebaseContext from './useFirebase';
 
 export const useGames = (): GameState[] => {
   const obs = useRef({} as () => void);
@@ -60,6 +60,7 @@ export const useGame = (
     bids: [],
   });
   const [error, setError] = useState('');
+  const auth = useAuth();
 
   useEffect(() => {
     obs.current = firebase.games.doc(gameId).onSnapshot(snapshot => {
@@ -67,6 +68,7 @@ export const useGame = (
 
       if (data) {
         setGame(data as Game);
+        auth.setAuthUserGame(data as Game);
         setError('');
       } else {
         setError('no-game');
@@ -76,7 +78,7 @@ export const useGame = (
     return () => {
       obs.current();
     };
-  }, [gameId, firebase]);
+  }, [gameId, firebase, auth]);
 
   return { game, error };
 };

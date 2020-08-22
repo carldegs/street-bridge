@@ -9,13 +9,11 @@ import { range, sortBy } from 'lodash';
 import { useGame } from '../../firebase/hooks';
 import { useFirebase } from '../../firebase/useFirebase';
 import { getSuitString } from '../../utils/cards';
-import { useStore } from '../../store/store';
 import { BidSuit, Card } from '../../models';
 import SBButton from '../../components/SBButton/SBButton';
-
 import toBidsArray from '../../utils/bids';
-
 import Cards from '../../components/Cards/Cards';
+import { useAuth } from '../../store/useAuth';
 
 import styles from './GameBid.module.scss';
 
@@ -29,7 +27,8 @@ const GameBid: React.FC = () => {
   const { id } = useParams();
   const { game } = useGame(id);
   const firebase = useFirebase();
-  const { authUser } = useStore();
+  const auth = useAuth();
+  const authUser = auth.state.authUser || { displayName: '' };
   const [bidValue, setBidValue] = useState<number | null>(null);
   const [bidSuit, setBidSuit] = useState<BidSuit | null>(null);
 
@@ -55,9 +54,9 @@ const GameBid: React.FC = () => {
   }, [game]);
 
   const { validBids, validSuits } = useMemo(() => {
-    const { value = 0, suit = BidSuit.none } = currBid || {};
+    const { value = 1, suit = BidSuit.none } = currBid || {};
 
-    const validBids = range(value, 7).filter(
+    const validBids = range(value === 0 ? 1 : value, 7).filter(
       i => i !== value || (i === value && suit !== BidSuit.noTrump)
     );
     let validSuits: { label: string; value: BidSuit }[] = [];
@@ -295,6 +294,7 @@ const GameBid: React.FC = () => {
               color="red"
               onClick={() => {
                 firebase.deleteGame(id);
+                auth.setAuthUserGame(null);
               }}
               className="mt-3"
             >

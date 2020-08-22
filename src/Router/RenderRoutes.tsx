@@ -3,17 +3,23 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 
+import { Game } from '../models';
+
 import { RouteObject } from './model';
 import ProtectedRoute from './ProtectedRoute';
 
 interface IRenderRoutes {
   routes: RouteObject[];
-  isAuthenticated: boolean;
+  isAuthenticating: boolean;
+  authUser: firebase.User | null;
+  authUserGame: Game | null;
 }
 
 const RenderRoutes: React.FC<IRenderRoutes> = ({
   routes,
-  isAuthenticated,
+  isAuthenticating,
+  authUser,
+  authUserGame,
 }: IRenderRoutes) => {
   return (
     <Switch>
@@ -22,7 +28,9 @@ const RenderRoutes: React.FC<IRenderRoutes> = ({
           <ProtectedRoute
             key={route.name}
             {...route}
-            isAuthenticated={isAuthenticated}
+            isAuthenticating={isAuthenticating}
+            authUser={authUser}
+            authUserGame={authUserGame}
           />
         );
       })}

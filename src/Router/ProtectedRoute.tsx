@@ -6,6 +6,7 @@ import startCase from 'lodash/startCase';
 import camelCase from 'lodash/camelCase';
 
 import SBNavbar from '../components/SBNavbar/SBNavbar';
+import { Game, Phase } from '../models';
 
 import { RouteObject } from './model';
 
@@ -23,7 +24,9 @@ const TitlePage: React.FC<ITitlePage> = ({ title, children }: ITitlePage) => {
 };
 
 interface IProtectedRoute extends RouteObject {
-  isAuthenticated?: boolean;
+  isAuthenticating: boolean;
+  authUser: firebase.User | null;
+  authUserGame: Game | null;
   key: string;
 }
 
@@ -34,29 +37,86 @@ const ProtectedRoute: React.FC<IProtectedRoute> = ({
   name,
   routes,
   title,
-  isAuthenticated = false,
+  isAuthenticating,
+  authUser,
+  authUserGame,
   isPublic,
   hideOnAuth,
   hideNavbar,
+  location,
 }: IProtectedRoute) => {
-  const hasValidRole = true; // TODO: create role checker
-  const showComponent =
-    (isPublic || (isAuthenticated && hasValidRole)) && !!Component;
+  if (!isPublic) {
+    if (isAuthenticating) {
+      return <div>Loading...</div>;
+    }
 
-  if (!showComponent) {
-    return (
-      <Redirect
-        to={{
-          pathname: '/',
-          state: {
-            from: path,
-          },
-        }}
-      />
-    );
+    if (!authUser || !Component) {
+      return (
+        <Redirect
+          to={{
+            pathname: '/',
+            state: {
+              from: path,
+            },
+          }}
+        />
+      );
+    }
+
+    if (
+      name === 'Game Lobby' ||
+      name === 'Bidding' ||
+      name === 'Gameplay' ||
+      name === 'Home Page'
+    ) {
+      let phase = Phase.post;
+
+      if (!authUserGame && (name === 'Bidding' || name === 'Gameplay')) {
+        return <Redirect to="/home" />;
+      }
+
+      if (authUserGame) {
+        const id = location?.pathname.split('/')[3] || authUserGame.id;
+
+        switch (name) {
+          case 'Game Lobby':
+            phase = Phase.lobby;
+            break;
+          case 'Bidding':
+            phase = Phase.bid;
+            break;
+          case 'Gameplay':
+            phase = Phase.game;
+            break;
+          default:
+            phase = -1;
+            break;
+        }
+
+        if (phase > authUserGame.phase || phase < authUserGame.phase) {
+          let to = '';
+          switch (authUserGame.phase) {
+            case Phase.bid:
+              to = 'bid';
+              break;
+            case Phase.lobby:
+              to = 'lobby';
+              break;
+            case Phase.game:
+              to = 'play';
+              break;
+            default:
+              to = 'post';
+              break;
+          }
+
+          return <Redirect to={`/game/${to}/${id}`} />;
+        }
+      }
+    }
   }
 
-  if (hideOnAuth && isAuthenticated) {
+  if (hideOnAuth && !!authUser) {
     return <Redirect to="/home" />;
   }
 
@@ -71,7 +131,9 @@ const ProtectedRoute: React.FC<IProtectedRoute> = ({
               {...props}
               routes={routes}
               name={name}
-              isAuthenticated={isAuthenticated}
+              isAuthenticating={isAuthenticating}
+              authUser={authUser}
+              authUserGame={authUserGame}
             />
           ) : (
             <SBNavbar title={title}>
@@ -79,7 +141,9 @@ const ProtectedRoute: React.FC<IProtectedRoute> = ({
                 {...props}
                 routes={routes}
                 name={name}
-                isAuthenticated={isAuthenticated}
+                isAuthenticating={isAuthenticating}
+                authUser={authUser}
+                authUserGame={authUserGame}
               />
             </SBNavbar>
           )}

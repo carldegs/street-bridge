@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { PlayerBid } from '../models';
 
 const toBidsArray = (bids?: Record<number, PlayerBid>): PlayerBid[] => {

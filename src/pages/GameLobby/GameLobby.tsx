@@ -1,21 +1,14 @@
 import React, { useMemo, useEffect } from 'react';
-
 import { useParams, Link, useHistory } from 'react-router-dom';
-
 import { Row, Col, Button, Badge, Modal, Container } from 'react-bootstrap';
-
 import { range } from 'lodash';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useFirebase } from '../../firebase/useFirebase';
-
-import { useStore } from '../../store/store';
 import { useGame } from '../../firebase/hooks';
-
 import SBButton from '../../components/SBButton/SBButton';
-
 import { Phase } from '../../models';
+import { useAuth } from '../../store/useAuth';
 
 import styles from './GameLobby.module.scss';
 
@@ -27,9 +20,11 @@ const GameLobby: React.FC = () => {
   const { game, error: gameError } = useGame(id);
   const { players } = game;
 
-  const { authUser } = useStore();
+  const auth = useAuth();
+  const authUser = auth.state.authUser || { displayName: '' };
+
   const currUserGameInfo = useMemo(() => {
-    if (game?.playerInfo && authUser.displayName) {
+    if (game?.playerInfo && authUser?.displayName) {
       return game.playerInfo[authUser.displayName];
     }
 
@@ -101,6 +96,7 @@ const GameLobby: React.FC = () => {
               color="cyan"
               onClick={() => {
                 firebase.deleteGame(id);
+                auth.setAuthUserGame(null);
               }}
               className="mt-3"
             >

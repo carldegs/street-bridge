@@ -1,5 +1,7 @@
 import { RouteProps } from 'react-router-dom';
 
+import { Game } from '../models';
+
 export interface RouteObject extends RouteProps {
   path: string;
   name: string;
@@ -12,4 +14,8 @@ export interface RouteObject extends RouteProps {
   // expectedRole?: UserRole | UserRole[];
   title?: string;
   hideNavbar?: boolean;
+  customCheck?: (
+    authUser: firebase.User | null,
+    game: Game | null
+  ) => void | string;
 }

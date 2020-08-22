@@ -6,7 +6,6 @@ import { Row, Col, Form, Alert } from 'react-bootstrap';
 import { Link, useHistory } from 'react-router-dom';
 
 import { useFirebase } from '../../firebase/useFirebase';
-import { useDispatch } from '../../store/store';
 
 import useForm, { IState } from '../../hooks/useForm';
 import FormInput from '../../components/FormInput/FormInput';
@@ -33,7 +32,6 @@ const Signup: React.FC = () => {
   const firebase = useFirebase();
   const history = useHistory();
   const [error] = useState('');
-  const dispatch = useDispatch();
 
   const submitCallback = useCallback(
     async (params: Partial<IState<typeof initialValues>>) => {

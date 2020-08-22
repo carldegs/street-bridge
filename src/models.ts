@@ -55,4 +55,5 @@ export interface Game {
   currPlayer: number;
   score: [number, number];
   bids: Record<number, PlayerBid>;
+  id?: string;
 }

@@ -35,9 +35,6 @@ class Firebase {
 
       this.auth = app.auth();
       this.db = app.firestore();
-      this.db.settings({
-        timestampsInSnapshots: true,
-      });
 
       this.games = this.db.collection('games');
     } else {
@@ -121,8 +118,7 @@ class Firebase {
         bids: [],
       };
       const res = await this.games.add({ ...game });
-
-      return res;
+      return res.id;
     } catch (err) {
       return err;
     }
