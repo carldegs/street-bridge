@@ -24,6 +24,7 @@ const Router: React.FC = () => {
       try {
         if (user) {
           setAuthUser(user);
+          // TODO: Check if cause of too many reads
           const res = await firebase.db
             .collection('games')
             .where('players', 'array-contains', user.displayName)

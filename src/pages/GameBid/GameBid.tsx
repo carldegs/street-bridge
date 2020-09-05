@@ -17,6 +17,7 @@ import { useAuth } from '../../store/useAuth';
 
 import styles from './GameBid.module.scss';
 
+// TODO: Make util
 const getScore = (isCurrTeam: boolean, bidValue: number): number =>
   isCurrTeam ? 6 + bidValue : 7 - bidValue;
 

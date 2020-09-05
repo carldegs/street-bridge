@@ -55,9 +55,12 @@ export const useGame = (
     phase: Phase.lobby,
     winBid: null,
     winTeam: null,
+    winPlayer: null,
     currPlayer: 0,
     score: [0, 0],
     bids: [],
+    currRound: 0,
+    rounds: [],
   });
   const [error, setError] = useState('');
   const auth = useAuth();
@@ -68,6 +71,7 @@ export const useGame = (
 
       if (data) {
         setGame(data as Game);
+        // TODO: Will this work???
         auth.setAuthUserGame(data as Game);
         setError('');
       } else {
@@ -78,7 +82,7 @@ export const useGame = (
     return () => {
       obs.current();
     };
-  }, [gameId, firebase, auth]);
+  }, [gameId, firebase]);
 
   return { game, error };
 };

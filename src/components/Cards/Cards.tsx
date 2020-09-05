@@ -3,46 +3,83 @@ import cx from 'classnames';
 
 import { Row, Col } from 'react-bootstrap';
 
-import { getCardValue, getSuitString } from '../../utils/cards';
-import { Card, CardSuit } from '../../models';
+import { Card, CardSuit, BidSuit } from '../../models';
+
+import CardComponent from '../CardComponent/CardComponent';
 
 import styles from './Cards.module.scss';
 
 interface ICards {
   cards: Card[];
+  roundSuit?: BidSuit;
+  isFirstPlayer?: boolean;
+  disabled?: boolean;
+  onClick?: (card: Card) => void;
 }
 
-const getCardColor = (suit: CardSuit) => {
-  switch (suit) {
-    case CardSuit.club:
-      return 'Purple';
-    case CardSuit.spade:
-      return 'Blue';
-    case CardSuit.diamond:
-      return 'Yellow';
-    case CardSuit.heart:
-    default:
-      return 'Red';
+const checkIfCardPlayable = (
+  cards: Card[],
+  card: Card,
+  isFirstPlayer: boolean,
+  roundSuit: BidSuit,
+  disabled = false
+): boolean => {
+  if (disabled) {
+    return false;
   }
+
+  if (isFirstPlayer) {
+    return true;
+  }
+
+  if (
+    cards.some(c => c.suit === ((roundSuit as unknown) as CardSuit)) &&
+    card.suit !== ((roundSuit as unknown) as CardSuit)
+  ) {
+    return false;
+  }
+
+  return true;
 };
 
-const Cards: React.FC<ICards> = ({ cards }: ICards) => {
+const Cards: React.FC<ICards> = ({
+  cards,
+  disabled,
+  onClick,
+  roundSuit = BidSuit.noTrump,
+  isFirstPlayer = false,
+}: ICards) => {
+  const finalCards = cards.filter(card => card.turnUsed === -1);
   return (
     <Row style={{ width: '100%' }}>
-      <Col className={styles.cards}>
-        {cards.map((card, i) => (
-          <div
-            key={`${card.value}${card.suit}`}
-            className={cx(styles.card, styles[`bg${getCardColor(card.suit)}`])}
-            style={{ zIndex: i }}
-          >
-            <div className={styles.cardVal}>{getCardValue(card.value)}</div>
-            <div className={styles.cardSuit}>{getSuitString(card.suit)}</div>
-            <div className={styles.cardValReverse}>
-              {getCardValue(card.value)}
-            </div>
-          </div>
-        ))}
+      <Col
+        className={cx(styles.cards, {
+          [styles.disabled]: !!disabled,
+        })}
+      >
+        {finalCards.map((card, i) => {
+          const isDisabled = !checkIfCardPlayable(
+            finalCards,
+            card,
+            isFirstPlayer,
+            roundSuit,
+            disabled
+          );
+          return (
+            <CardComponent
+              key={`${card.value}${card.suit}`}
+              card={card}
+              style={{ zIndex: i }}
+              disabled={isDisabled}
+              onClick={() => {
+                if (!isDisabled && !!onClick) {
+                  onClick(card);
+                }
+              }}
+              className={styles.card}
+            />
+          );
+        })}
       </Col>
     </Row>
   );
