@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Form, Row, Col, Alert, Container } from 'react-bootstrap';
 import Joi from '@hapi/joi';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import useForm, { IState } from '../../hooks/useForm';
 import { useFirebase } from '../../firebase/useFirebase';
@@ -12,7 +13,6 @@ import { ActionType, useDispatch } from '../../store/store';
 import SBButton from '../../components/SBButton/SBButton';
 
 import styles from './Landing.module.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const initialValues = {
   email: '',
