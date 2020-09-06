@@ -7,14 +7,12 @@ import { sortBy } from 'lodash';
 import { useGame } from '../../firebase/hooks';
 import { useFirebase } from '../../firebase/useFirebase';
 import { useAuth } from '../../store/useAuth';
-
 import Cards from '../../components/Cards/Cards';
 import { Card, Round, BidSuit } from '../../models';
-
 import CardComponent from '../../components/CardComponent/CardComponent';
+import { getScoreToWin } from '../../utils/bids';
 
 import styles from './GamePlay.module.scss';
-import { getScoreToWin } from '../../utils/bids';
 
 const GamePlay: React.FC = () => {
   const { id } = useParams();
