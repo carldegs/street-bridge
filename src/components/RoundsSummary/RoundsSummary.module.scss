@@ -1,0 +1,20 @@
+@import '../../scss/constants.scss';
+.RoundsSummary {
+  font-family: IBM Plex Sans;
+  font-style: normal;
+  font-size: 16px;
+  text-align: left;
+}
+
+.textRed {
+  color: $red !important;
+}
+
+.textBlue {
+  color: $blue !important;
+}
+
+.row {
+  border-bottom: 1px solid $dark0;
+  padding: 8px 0px;
+}

@@ -13,6 +13,7 @@ interface ICard {
   onClick?: (card: Card) => void;
   style?: Record<string, any>;
   className?: string;
+  small?: boolean;
 }
 
 const getCardColor = (suit: CardSuit) => {
@@ -35,6 +36,7 @@ const CardComponent: React.FC<ICard> = ({
   onClick,
   style,
   className,
+  small,
 }: ICard) =>
   card ? (
     <div
@@ -42,7 +44,7 @@ const CardComponent: React.FC<ICard> = ({
         styles.card,
         styles[`bg${getCardColor(card.suit)}`],
         className,
-        { [styles.disabled]: disabled }
+        { [styles.disabled]: disabled, [styles.small]: small }
       )}
       style={style}
       onClick={() => {
@@ -53,7 +55,9 @@ const CardComponent: React.FC<ICard> = ({
     >
       <div className={styles.cardVal}>{getCardValue(card.value)}</div>
       <div className={styles.cardSuit}>{getSuitString(card.suit)}</div>
-      <div className={styles.cardValReverse}>{getCardValue(card.value)}</div>
+      {!small && (
+        <div className={styles.cardValReverse}>{getCardValue(card.value)}</div>
+      )}
     </div>
   ) : null;
 
