@@ -53,5 +53,10 @@
     bottom: 12px;
     right: 12px;
     color: $dark0;
+    cursor: pointer;
+
+    &:hover {
+      color: $light;
+    }
   }
 }

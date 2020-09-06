@@ -12,6 +12,7 @@ import { ActionType, useDispatch } from '../../store/store';
 import SBButton from '../../components/SBButton/SBButton';
 
 import styles from './Landing.module.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const initialValues = {
   email: '',
@@ -99,7 +100,16 @@ const Landing: React.FC = () => {
         </Col>
       </Row>
 
-      <div className={styles.version}>{process.env.REACT_APP_VERSION}</div>
+      <div
+        className={styles.version}
+        onClick={() => {
+          window.open('https://github.com/carldegs/street-bridge', '_blank');
+        }}
+        title="Open GitHub repo"
+      >
+        {process.env.REACT_APP_VERSION}
+        <FontAwesomeIcon icon="code-branch" className="ml-3" />
+      </div>
     </Container>
   );
 };
