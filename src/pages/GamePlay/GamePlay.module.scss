@@ -29,31 +29,6 @@
     writing-mode: vertical-lr;
   }
 
-  .redScore, .blueScore {
-    font-family: IBM Plex Sans;
-    font-style: normal;
-    font-weight: 900;
-    font-size: 90px;
-    color: $dark0;
-    text-align: center;
-  
-    .subtitle {
-      font-family: IBM Plex Serif;
-      font-style: italic;
-      font-weight: bold;
-      font-size: 20px;
-      color: $dark0;
-    }
-  }
-
-  .redScore {
-    color: $red;
-  }
-
-  .blueScore {
-    color: $blue;
-  }
-
   .table {
     width: 550px;
     height: 550px;
@@ -75,7 +50,7 @@
 
     &.winBlue {
       background-color: $blue;
-    } 
+    }
 
     &.topBoxBlue {
       box-shadow: inset 0 14px 18px -14px $blue;
@@ -155,4 +130,48 @@
 
 .textBlue {
   color: $blue !important;
+}
+
+
+.bidInfo {
+  font-family: IBM Plex Sans;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 90px;
+  color: $dark0;
+}
+
+.redScore,
+.blueScore {
+  font-family: IBM Plex Sans;
+  font-style: normal;
+  font-weight: 900;
+  font-size: 90px;
+  color: $dark0;
+  text-align: center;
+}
+
+.subtitle {
+  font-family: IBM Plex Serif;
+  font-style: italic;
+  font-weight: bold;
+  font-size: 20px;
+  color: $dark0;
+}
+
+.redScore {
+  color: $red;
+}
+
+.blueScore {
+  color: $blue;
+}
+
+.postHeader {
+  font-family: IBM Plex Serif;
+  font-style: italic;
+  font-weight: bold;
+  font-size: 64px;
+  color: $dark0;
+  text-align: center;
 }

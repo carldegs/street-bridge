@@ -1,136 +1,32 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import cx from 'classnames';
-import { useParams } from 'react-router-dom';
-import { Col, Row } from 'react-bootstrap';
+import { useParams, Link, useHistory } from 'react-router-dom';
+import { Col, Row, Modal } from 'react-bootstrap';
 import { sortBy } from 'lodash';
 
 import { useGame } from '../../firebase/hooks';
 import { useFirebase } from '../../firebase/useFirebase';
 import { useAuth } from '../../store/useAuth';
 import Cards from '../../components/Cards/Cards';
-import { Card, Round, BidSuit } from '../../models';
+import { Card, BidSuit, Phase } from '../../models';
 import CardComponent from '../../components/CardComponent/CardComponent';
-import { getScoreToWin } from '../../utils/bids';
+import SBButton from '../../components/SBButton/SBButton';
+import { getSuitString } from '../../utils/cards';
+
+import RoundsSummary from '../../components/RoundsSummary/RoundsSummary';
 
 import styles from './GamePlay.module.scss';
+import useGameDetails from './useGameDetails';
 
 const GamePlay: React.FC = () => {
+  const history = useHistory();
   const { id } = useParams();
-  const { game } = useGame(id);
+  const { game, error: gameError } = useGame(id);
+  const playersTable = useGameDetails(id);
   const firebase = useFirebase();
   const auth = useAuth();
   const authUser = auth.state.authUser || { displayName: '' };
-
-  const playersTable = useMemo(() => {
-    if (game.players?.length === 4 && authUser.displayName) {
-      const authUserPosition = game.players.indexOf(authUser.displayName);
-
-      const leftPlayer = game.players[(authUserPosition + 1) % 4];
-      const topPlayer = game.players[(authUserPosition + 2) % 4];
-      const rightPlayer = game.players[(authUserPosition + 3) % 4];
-
-      const { team } = game.playerInfo[authUser.displayName];
-      const teamColor = team === 0 ? 'Red' : 'Blue';
-      const enemyColor = team === 0 ? 'Blue' : 'Red';
-      const currPlayer = game.players[game.currPlayer];
-      const currPlayerColor =
-        game.playerInfo[currPlayer].team === 0 ? 'Red' : 'Blue';
-
-      const currRoundNum = game?.currRound || 0;
-      const currRound: Round | null = game?.rounds
-        ? game.rounds[currRoundNum]
-        : null;
-      const bidWinner = game?.winTeam;
-      const scoresToWin =
-        game?.winBid?.value && bidWinner !== undefined
-          ? [
-              getScoreToWin(bidWinner === 0, game.winBid.value),
-              getScoreToWin(bidWinner === 1, game.winBid.value),
-            ]
-          : undefined;
-
-      let roundSuit = BidSuit.noTrump;
-      if (typeof currRoundNum === 'number') {
-        const prevRoundNum = currRoundNum - 1;
-        const firstTurnPlayer =
-          currRoundNum > 0
-            ? game.rounds[prevRoundNum].winningPlayer || undefined
-            : game.winPlayer || undefined;
-
-        if (firstTurnPlayer && currRound) {
-          const firstPlayerRound = currRound[firstTurnPlayer] as Card;
-
-          if (firstPlayerRound) {
-            roundSuit = (firstPlayerRound.suit as unknown) as BidSuit;
-          }
-        }
-      }
-
-      let roundWinner;
-      if (currRound && currRound?.winningPlayer) {
-        if (currRound?.winningTeam === 0) {
-          roundWinner = 'Red';
-        } else if (currRound?.winningTeam === 1) {
-          roundWinner = 'Blue';
-        }
-      }
-
-      return {
-        left: {
-          username: leftPlayer,
-          color: enemyColor,
-          isCurrPlayer: leftPlayer === currPlayer,
-          card: currRound ? (currRound[leftPlayer] as Card) : undefined,
-        },
-        top: {
-          username: topPlayer,
-          color: teamColor,
-          isCurrPlayer: topPlayer === currPlayer,
-          card: currRound ? (currRound[topPlayer] as Card) : undefined,
-        },
-        right: {
-          username: rightPlayer,
-          color: enemyColor,
-          isCurrPlayer: rightPlayer === currPlayer,
-          card: currRound ? (currRound[rightPlayer] as Card) : undefined,
-        },
-        teamColor,
-        enemyColor,
-        currPlayer,
-        currPlayerColor,
-        currPlayerCard: currRound
-          ? (currRound[authUser.displayName] as Card)
-          : undefined,
-        isFirstPlayer: !(currRound && currRound[rightPlayer]),
-        roundSuit,
-        scoresToWin,
-        roundWinner,
-      };
-    }
-
-    return {
-      top: {
-        username: '',
-        color: 'Red',
-        isCurrPlayer: false,
-      },
-      right: {
-        username: '',
-        color: 'Blue',
-        isCurrPlayer: false,
-      },
-      left: {
-        username: '',
-        color: 'Blue',
-        isCurrPlayer: false,
-      },
-      currPlayerColor: 'Red',
-      isFirstPlayer: false,
-      roundSuit: BidSuit.noTrump,
-      scoresToWin: undefined,
-      roundWinner: undefined,
-    };
-  }, [game, authUser]);
+  const [showStopModal, setShowStopModal] = useState(false);
 
   const cards: Card[] = useMemo(() => {
     if (authUser.displayName) {
@@ -142,19 +38,114 @@ const GamePlay: React.FC = () => {
 
   return (
     <div className={styles.GamePlay}>
+      <Modal show={gameError === 'no-game' && game.phase !== Phase.post}>
+        <Modal.Header>Game Stopped</Modal.Header>
+        <Modal.Footer>
+          <Link to="/home">
+            <SBButton>Back to Lobby</SBButton>
+          </Link>
+        </Modal.Footer>
+      </Modal>
+      <Modal show={showStopModal} onHide={() => setShowStopModal(false)}>
+        <Modal.Header closeButton>Stop Game</Modal.Header>
+        <Modal.Body>Are you sure you want to stop the game?</Modal.Body>
+        <Modal.Footer>
+          <SBButton onClick={() => setShowStopModal(false)}>CANCEL</SBButton>
+          <SBButton
+            color="red"
+            onClick={() => {
+              firebase.deleteGame(id);
+              auth.setAuthUserGame(null);
+            }}
+          >
+            STOP GAME
+          </SBButton>
+        </Modal.Footer>
+      </Modal>
+      <Modal size="xl" show={game.phase === Phase.post}>
+        <Modal.Body className="d-flex flex-column justify-content-center">
+          <Row>
+            <Col>
+              <div
+                className={cx(
+                  styles.postHeader,
+                  styles[`text${playersTable.gameWinner}`]
+                )}
+              >
+                {`${playersTable.gameWinner} Team Wins!`}
+              </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col className={styles.redScore}>
+              {game?.score?.length ? game.score[0] : 0}
+              <div className={styles.subtitle}>
+                {playersTable.scoresToWin
+                  ? `${playersTable.scoresToWin[0]} to win`
+                  : 'N/A'}
+              </div>
+            </Col>
+            <Col className={styles.blueScore}>
+              {game?.score?.length ? game.score[1] : 0}
+              <div className={styles.subtitle}>
+                {playersTable.scoresToWin
+                  ? `${playersTable.scoresToWin[1]} to win`
+                  : 'N/A'}
+              </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col className="mx-5 my-4">
+              <RoundsSummary rounds={game?.rounds} players={game?.playerInfo} />
+            </Col>
+          </Row>
+        </Modal.Body>
+        <Modal.Footer>
+          <SBButton
+            outline
+            color="green"
+            disabled={!playersTable.isHost && gameError !== 'no-game'}
+            onClick={() => {
+              if (gameError !== 'no-game') {
+                firebase.deleteGame(id);
+                auth.setAuthUserGame(null);
+              }
+
+              history.push('/home');
+            }}
+          >
+            {playersTable.isHost ||
+            (!playersTable.isHost && gameError === 'no-game')
+              ? 'Back to Lobby'
+              : 'Waiting for host...'}
+          </SBButton>
+        </Modal.Footer>
+      </Modal>
       <Row style={{ width: '100%' }}>
         <Col
           sm={2}
           className="d-flex flex-column align-items-center justify-content-center"
         >
-          <div className={cx(styles.redScore)}>
-            {game?.score?.length ? game.score[0] : 0}
-            <div className={styles.subtitle}>
-              {playersTable.scoresToWin
-                ? `${playersTable.scoresToWin[0]} to win`
-                : 'N/A'}
-            </div>
+          <div
+            className={cx(
+              styles.bidInfo,
+              styles[`text${playersTable.bidColor}`]
+            )}
+          >
+            {playersTable?.currBid?.value ? (
+              <>
+                {playersTable?.currBid.suit !== BidSuit.pass
+                  ? playersTable?.currBid.value
+                  : ''}
+                <span className="font-weight-bold">
+                  {getSuitString(playersTable?.currBid.suit)}
+                </span>
+              </>
+            ) : (
+              'N/A'
+            )}
           </div>
+          <div className={styles.subtitle}>Current Bid</div>
         </Col>
         <Col>
           <div className={styles.row1}>
@@ -250,7 +241,15 @@ const GamePlay: React.FC = () => {
           sm={2}
           className="d-flex flex-column align-items-center justify-content-center"
         >
-          <div className={cx(styles.blueScore)}>
+          <div className={styles.redScore}>
+            {game?.score?.length ? game.score[0] : 0}
+            <div className={styles.subtitle}>
+              {playersTable.scoresToWin
+                ? `${playersTable.scoresToWin[0]} to win`
+                : 'N/A'}
+            </div>
+          </div>
+          <div className={styles.blueScore}>
             {game?.score?.length ? game.score[1] : 0}
             <div className={styles.subtitle}>
               {playersTable.scoresToWin
@@ -260,20 +259,39 @@ const GamePlay: React.FC = () => {
           </div>
         </Col>
       </Row>
-      <Cards
-        cards={cards}
-        disabled={
-          playersTable.currPlayer !== authUser.displayName ||
-          !!playersTable.currPlayerCard
-        }
-        onClick={card => {
-          if (authUser.displayName) {
-            firebase.playCard(id, authUser.displayName, card);
-          }
-        }}
-        isFirstPlayer={playersTable.isFirstPlayer}
-        roundSuit={playersTable.roundSuit}
-      />
+      <Row className="w-100">
+        <Col xs={2} className="d-flex align-items-center mt-3 ml-3">
+          {playersTable.isHost && (
+            <SBButton
+              outline
+              color="red"
+              className="mt-3"
+              onClick={() => {
+                setShowStopModal(true);
+              }}
+            >
+              STOP GAME
+            </SBButton>
+          )}
+        </Col>
+        <Col>
+          <Cards
+            cards={cards}
+            disabled={
+              playersTable.currPlayer !== authUser.displayName ||
+              !!playersTable.currPlayerCard
+            }
+            onClick={card => {
+              if (authUser.displayName) {
+                firebase.playCard(id, authUser.displayName, card);
+              }
+            }}
+            isFirstPlayer={playersTable.isFirstPlayer}
+            roundSuit={playersTable.roundSuit}
+          />
+        </Col>
+        <Col xs={1} />
+      </Row>
     </div>
   );
 };

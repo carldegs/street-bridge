@@ -8,6 +8,7 @@ import { sample, range } from 'lodash';
 
 import { Game, BidSuit, Phase, Bid, Card, CardSuit } from '../models';
 import { createSplitDeck } from '../utils/cards';
+import { getScoreToWin } from '../utils/bids';
 
 const config = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -330,13 +331,27 @@ class Firebase {
             const scoreTeam0 = data.score[0] + (winningTeam === 0 ? 1 : 0);
             const scoreTeam1 = data.score[1] + (winningTeam === 1 ? 1 : 0);
 
-            // TODO: Check if a team reached their score to win.
+            let phase = Phase.game;
+            if (data.winBid?.value) {
+              const scoresToWin = [
+                getScoreToWin(data.winTeam === 0, data.winBid.value),
+                getScoreToWin(data.winTeam === 1, data.winBid.value),
+              ];
+
+              if (
+                scoreTeam0 >= scoresToWin[0] ||
+                scoreTeam1 >= scoresToWin[1]
+              ) {
+                phase = Phase.post;
+              }
+            }
 
             nextPlayer = data.players.indexOf(winningPlayer);
             roundResult = {
               [`rounds.${data.currRound}.winningTeam`]: winningTeam,
               [`rounds.${data.currRound}.winningPlayer`]: winningPlayer,
               score: [scoreTeam0, scoreTeam1],
+              phase,
             };
           }
 
