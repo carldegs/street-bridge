@@ -98,6 +98,8 @@ const Landing: React.FC = () => {
           <div className={styles.bridge}>Bridge</div>
         </Col>
       </Row>
+
+      <div className={styles.version}>{process.env.REACT_APP_VERSION}</div>
     </Container>
   );
 };
