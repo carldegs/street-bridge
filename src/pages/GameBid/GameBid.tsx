@@ -11,15 +11,11 @@ import { useFirebase } from '../../firebase/useFirebase';
 import { getSuitString } from '../../utils/cards';
 import { BidSuit, Card } from '../../models';
 import SBButton from '../../components/SBButton/SBButton';
-import toBidsArray from '../../utils/bids';
+import { toBidsArray, getScoreToWin } from '../../utils/bids';
 import Cards from '../../components/Cards/Cards';
 import { useAuth } from '../../store/useAuth';
 
 import styles from './GameBid.module.scss';
-
-// TODO: Make util
-const getScore = (isCurrTeam: boolean, bidValue: number): number =>
-  isCurrTeam ? 6 + bidValue : 7 - bidValue;
 
 const getColor = (team: number): 'Red' | 'Blue' =>
   team === 0 ? 'Red' : 'Blue';
@@ -40,8 +36,8 @@ const GameBid: React.FC = () => {
     const scoreToWin =
       currBid && currBid.value
         ? [
-            getScore(currBidTeam === 0, currBid.value),
-            getScore(currBidTeam === 1, currBid.value),
+            getScoreToWin(currBidTeam === 0, currBid.value),
+            getScoreToWin(currBidTeam === 1, currBid.value),
           ]
         : null;
 

@@ -14,10 +14,7 @@ import { Card, Round, BidSuit } from '../../models';
 import CardComponent from '../../components/CardComponent/CardComponent';
 
 import styles from './GamePlay.module.scss';
-
-// TODO: Make util
-const getScore = (isCurrTeam: boolean, bidValue: number): number =>
-  isCurrTeam ? 6 + bidValue : 7 - bidValue;
+import { getScoreToWin } from '../../utils/bids';
 
 const GamePlay: React.FC = () => {
   const { id } = useParams();
@@ -49,8 +46,8 @@ const GamePlay: React.FC = () => {
       const scoresToWin =
         game?.winBid?.value && bidWinner !== undefined
           ? [
-              getScore(bidWinner === 0, game.winBid.value),
-              getScore(bidWinner === 1, game.winBid.value),
+              getScoreToWin(bidWinner === 0, game.winBid.value),
+              getScoreToWin(bidWinner === 1, game.winBid.value),
             ]
           : undefined;
 
