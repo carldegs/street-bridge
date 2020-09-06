@@ -45,6 +45,12 @@ export interface PlayerInfo {
   isHost: boolean;
 }
 
+export interface Round {
+  [key: string]: Card | number | string;
+  winningTeam: number;
+  winningPlayer: string;
+}
+
 export interface Game {
   name: string;
   players: string[];
@@ -52,8 +58,11 @@ export interface Game {
   phase: Phase;
   winBid: Bid | null;
   winTeam: number | null;
+  winPlayer: string | null;
   currPlayer: number;
   score: [number, number];
   bids: Record<number, PlayerBid>;
   id?: string;
+  currRound: number;
+  rounds: Record<number, Round>;
 }

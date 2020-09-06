@@ -6,7 +6,7 @@ import 'firebase/firestore';
 
 import { sample, range } from 'lodash';
 
-import { Game, BidSuit, Phase, Bid } from '../models';
+import { Game, BidSuit, Phase, Bid, Card, CardSuit } from '../models';
 import { createSplitDeck } from '../utils/cards';
 
 const config = {
@@ -113,9 +113,12 @@ class Firebase {
         phase: Phase.lobby,
         winBid: null,
         winTeam: null,
+        winPlayer: null,
         currPlayer: 0,
         score: [0, 0],
         bids: [],
+        currRound: 0,
+        rounds: [],
       };
       const res = await this.games.add({ ...game });
       return res.id;
@@ -223,8 +226,20 @@ class Firebase {
             info => info.username !== username && info.bid.suit === BidSuit.pass
           ).length;
 
+          let currPlayer = (data.currPlayer + 1) % 4;
+
           const enoughPassed = numPass === 2 && bid.suit === BidSuit.pass;
           const maxBidReached = bid.suit === BidSuit.noTrump && bid.value === 6;
+
+          if (enoughPassed) {
+            const bidWinner = Object.values(data.playerInfo).filter(
+              info =>
+                info.username !== username && info.bid.suit !== BidSuit.pass
+            )[0];
+            const bidWinnerPosition =
+              data.players.indexOf(bidWinner.username) || data.currPlayer;
+            currPlayer = (bidWinnerPosition + 1) % 4;
+          }
 
           transaction.update(gameRef, {
             [`playerInfo.${username}.bid.suit`]: bid.suit,
@@ -232,10 +247,11 @@ class Firebase {
             [`bids.${numBids}.suit`]: bid.suit,
             [`bids.${numBids}.value`]: bid.value,
             [`bids.${numBids}.username`]: username,
-            currPlayer: (data.currPlayer + 1) % 4,
+            currPlayer,
             ...(bid.suit !== BidSuit.pass && {
               winBid: bid,
               winTeam: data.playerInfo[username].team,
+              winPlayer: username,
             }),
             ...((enoughPassed || maxBidReached) && { phase: Phase.game }),
           });
@@ -244,6 +260,128 @@ class Firebase {
 
       return res;
     } catch (err) {
+      return err;
+    }
+  };
+
+  playCard = async (gameId: string, username: string, card: Card) => {
+    try {
+      const res = await this.db.runTransaction(async transaction => {
+        const gameRef = this.games.doc(gameId);
+        // eslint-disable-next-line consistent-return
+        return transaction.get(gameRef).then(async getGame => {
+          if (!getGame.exists) {
+            throw new Error('Game does not exist!');
+          }
+
+          const data = getGame.data() as Game;
+          let nextPlayer = (data.currPlayer + 1) % 4;
+          let roundResult: any | null = null;
+
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { winningTeam: wt, winningPlayer: wp, ...currRoundData } =
+            data.rounds[data.currRound] || {};
+
+          const isLastTurn =
+            currRoundData && Object.keys(currRoundData).length === 3;
+
+          if (isLastTurn) {
+            // Compute Winner
+            let cards: {
+              card: Card;
+              player: string;
+              team: number;
+            }[] = [];
+
+            data.players.forEach(player => {
+              cards = [
+                ...cards,
+                {
+                  card: currRoundData[player]
+                    ? (currRoundData[player] as Card)
+                    : card,
+                  player,
+                  team: data.playerInfo[player].team,
+                },
+              ];
+            });
+
+            const winBid = data.winBid || { suit: BidSuit.noTrump, value: 1 };
+
+            const trumpSuit =
+              winBid.suit !== BidSuit.noTrump &&
+              cards
+                .filter(c => c)
+                .some(
+                  c => c.card.suit === ((winBid.suit as unknown) as CardSuit)
+                )
+                ? ((winBid.suit as unknown) as CardSuit)
+                : (((currRoundData[
+                    data.players[(data.currPlayer + 1) % 4]
+                  ] as Card).suit as unknown) as CardSuit);
+
+            const trumpCards = cards
+              .filter(c => c.card.suit === trumpSuit)
+              .sort((a, b) => b.card.value - a.card.value);
+
+            const winningPlayer = trumpCards[0].player;
+            const winningTeam = trumpCards[0].team;
+
+            const scoreTeam0 = data.score[0] + (winningTeam === 0 ? 1 : 0);
+            const scoreTeam1 = data.score[1] + (winningTeam === 1 ? 1 : 0);
+
+            // TODO: Check if a team reached their score to win.
+
+            nextPlayer = data.players.indexOf(winningPlayer);
+            roundResult = {
+              [`rounds.${data.currRound}.winningTeam`]: winningTeam,
+              [`rounds.${data.currRound}.winningPlayer`]: winningPlayer,
+              score: [scoreTeam0, scoreTeam1],
+            };
+          }
+
+          const updatedPlayerCards = data.playerInfo[username].cards.map(c => ({
+            ...c,
+            turnUsed:
+              c.suit === card.suit && c.value === card.value
+                ? data.currRound
+                : c.turnUsed,
+          }));
+
+          if (isLastTurn) {
+            transaction.update(gameRef, {
+              [`playerInfo.${username}.cards`]: updatedPlayerCards,
+              [`rounds.${data.currRound}.${username}.suit`]: card.suit,
+              [`rounds.${data.currRound}.${username}.value`]: card.value,
+              [`rounds.${data.currRound}.${username}.turnUsed`]: data.currRound,
+              ...(roundResult && { ...roundResult }),
+            });
+
+            return {
+              currPlayer: nextPlayer,
+              ...(roundResult && { currRound: data.currRound + 1 }),
+            };
+          }
+
+          transaction.update(gameRef, {
+            [`playerInfo.${username}.cards`]: updatedPlayerCards,
+            [`rounds.${data.currRound}.${username}.suit`]: card.suit,
+            [`rounds.${data.currRound}.${username}.value`]: card.value,
+            [`rounds.${data.currRound}.${username}.turnUsed`]: data.currRound,
+            currPlayer: nextPlayer,
+            ...(roundResult && { ...roundResult }),
+          });
+        });
+      });
+
+      if (res) {
+        await new Promise(r => setTimeout(r, 1500));
+        this.games.doc(gameId).update(res);
+      }
+
+      return res;
+    } catch (err) {
+      console.error(err);
       return err;
     }
   };

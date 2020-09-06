@@ -5,19 +5,19 @@
   display: flex;
   justify-content: center;
   margin-top: 24px;
+
+  &.disabled {
+    opacity: 0.8;
+  }
+}
+
+.cards.disabled .card {
+  cursor: not-allowed;
+  transform: scale(0.8);
+  margin-left: -42px;
 }
 
 .card {
-  width: 100px;
-  height: 140px;
-  border: 6px solid $light;
-  box-sizing: border-box;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 16px;
-  padding: 4px 6px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   margin-left: -32px;
   transform: scale(1);
   transition: margin-left 0.3s, margin-right 0.3s, transform 0.3s;
@@ -25,32 +25,9 @@
   cursor: pointer;
 
   &:hover {
-    margin-left: 16px;
-    margin-right: 48px;
-    transform: scale(1.2);
-  }
-
-  .cardVal,
-  .cardValReverse {
-    font-family: IBM Plex Sans;
-    font-style: normal;
-    font-weight: bold;
-    font-size: 20px;
-  }
-
-  .cardValReverse {
-    margin-top: 12px;
-    transform: rotate(180deg);
-  }
-
-  .cardSuit {
-    font-family: IBM Plex Sans;
-    font-style: normal;
-    font-weight: bold;
-    font-size: 65px;
-    text-align: center;
-    line-height: 65px;
-    margin-top: -12px;
+    margin-left: 16px !important;
+    margin-right: 48px !important;
+    transform: scale(1.2) !important;
   }
 }
 

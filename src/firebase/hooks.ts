@@ -12,7 +12,6 @@ export const useGames = (): GameState[] => {
   const obs = useRef({} as () => void);
   const firebase = useContext(FirebaseContext);
   const { state, dispatch } = useContext(store);
-  // TODO: displayName instead
   const [games, setGames] = useState<GameState[]>([]);
   const { displayName } = state.authUser;
 
@@ -55,12 +54,15 @@ export const useGame = (
     phase: Phase.lobby,
     winBid: null,
     winTeam: null,
+    winPlayer: null,
     currPlayer: 0,
     score: [0, 0],
     bids: [],
+    currRound: 0,
+    rounds: [],
   });
   const [error, setError] = useState('');
-  const auth = useAuth();
+  const { setAuthUserGame } = useAuth();
 
   useEffect(() => {
     obs.current = firebase.games.doc(gameId).onSnapshot(snapshot => {
@@ -68,7 +70,8 @@ export const useGame = (
 
       if (data) {
         setGame(data as Game);
-        auth.setAuthUserGame(data as Game);
+        // TODO: Will this work???
+        setAuthUserGame(data as Game);
         setError('');
       } else {
         setError('no-game');
@@ -78,7 +81,7 @@ export const useGame = (
     return () => {
       obs.current();
     };
-  }, [gameId, firebase, auth]);
+  }, [gameId, firebase, setAuthUserGame]);
 
   return { game, error };
 };

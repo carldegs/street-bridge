@@ -5,6 +5,7 @@ import Home from './Home/Home';
 import Signup from './Signup/Signup';
 import GameLobby from './GameLobby/GameLobby';
 import GameBid from './GameBid/GameBid';
+import GamePlay from './GamePlay/GamePlay';
 
 const ROOT_ROUTES: RouteObject[] = [
   {
@@ -42,7 +43,7 @@ const ROOT_ROUTES: RouteObject[] = [
   {
     path: '/game/play/:id',
     name: 'Gameplay',
-    component: GameBid,
+    component: GamePlay,
   },
 ];
 
