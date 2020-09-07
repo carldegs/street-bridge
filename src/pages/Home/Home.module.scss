@@ -2,9 +2,8 @@
 
 .Home {
   display: flex;
-  // align-items: center;
   justify-content: center;
-  margin-top: 12px;
+  margin-top: 24px;
   height: calc(100% - 12px);
 
   .content {
@@ -60,9 +59,34 @@
   .gameActions {
     display: flex;
     padding: 12px 16px;
-    background-color: $light;
+    background-color: $dark1;
     width: 100%;
     border-radius: 0px 0px 16px 16px;
     justify-content: flex-end;
+  }
+}
+
+.noGames {
+  font-family: 'IBM Plex Serif';
+  font-style: italic;
+  font-weight: bold;
+  font-size: 20px;
+  letter-spacing: -0.06em;
+  background-color: $dark2;
+  padding: 12px 24px;
+  text-align: center;
+  border-radius: 12px;
+  margin-top: 32px;
+  color: $dark0;
+}
+
+.gameNameModal {
+  &Title {
+    font-weight: bold;
+    font-size: 24px;
+  }
+
+  &Label {
+    color: $light;
   }
 }

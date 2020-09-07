@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Modal, Form } from 'react-bootstrap';
 import cx from 'classnames';
 import { useHistory } from 'react-router-dom';
 import { sample } from 'lodash';
@@ -18,23 +18,64 @@ const Home: React.FC = () => {
   const firebase = useFirebase();
   const auth = useAuth();
   const username = auth.state.authUser?.displayName || '';
+  const [showNameModal, setShowNameModal] = useState(false);
+  const [gameName, setGameName] = useState('');
+  const [allowCreateGame, setAllowCreateGame] = useState(false);
 
   const games = useGames();
 
   return (
     <div className={styles.Home} data-testid="Home">
+      <Modal
+        show={showNameModal}
+        onHide={() => {
+          setShowNameModal(false);
+          setGameName('');
+          setAllowCreateGame(false);
+        }}
+      >
+        <Modal.Header closeButton>
+          <div className={styles.gameNameModalTitle}>Create Game</div>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group controlId="gameName">
+            <Form.Label className={styles.gameNameModalLabel}>
+              Game Name
+            </Form.Label>
+            <Form.Control
+              value={gameName}
+              onChange={e => {
+                setGameName(e.target.value);
+              }}
+              onBlur={() => {
+                setAllowCreateGame(!!gameName);
+              }}
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <SBButton
+            outline
+            color="green"
+            disabled={!allowCreateGame}
+            onClick={async () => {
+              const id = await firebase.createGame(username, gameName);
+              const game = await firebase.games.doc(id).get();
+              auth.setAuthUserGame(game.data() as Game);
+              history.push(`/game/lobby/${id}`);
+            }}
+          >
+            CREATE GAME
+          </SBButton>
+        </Modal.Footer>
+      </Modal>
       <div className={styles.content}>
         <Row style={{ height: '42px' }}>
-          <Col className="float-right">
+          <Col className="d-flex justify-content-end">
             <SBButton
               outline
               color="red"
-              onClick={async () => {
-                const id = await firebase.createGame(username);
-                const game = await firebase.games.doc(id).get();
-                auth.setAuthUserGame(game.data() as Game);
-                history.push(`/game/lobby/${id}`);
-              }}
+              onClick={() => setShowNameModal(true)}
             >
               <FontAwesomeIcon icon="plus" className="mr-2" />
               CREATE GAME
@@ -42,54 +83,53 @@ const Home: React.FC = () => {
           </Col>
         </Row>
         <Row>
-          {games.map(game => (
-            <Col xs={6} key={game.id} className={styles.game}>
-              <div
-                className={cx(
-                  styles.gameHeader,
-                  styles[
-                    sample([
-                      'red',
-                      'purple',
-                      'blue',
-                      'yellow',
-                      'green',
-                      'cyan',
-                    ]) as string
-                  ]
-                )}
-              >
-                <div className={styles.gameTitle}>{game.name}</div>
-                <div className={styles.gameInfo}>
-                  <div className="mr-5">
-                    <FontAwesomeIcon icon="user-friends" className="mr-2" />
-                    {game.numPlayers}
-                    /4
-                  </div>
-                  <div>
-                    <FontAwesomeIcon icon="fingerprint" className="mr-2" />
-                    {game.id}
-                  </div>
-                </div>
-              </div>
-              <div className={cx(styles.gameActions, 'float-right')}>
-                <SBButton
-                  outline
-                  className="mr-3"
-                  onClick={() => firebase.deleteGame(game.id)}
-                >
-                  DELETE
-                </SBButton>
-                <SBButton
-                  onClick={() => {
-                    history.push(`/game/lobby/${game.id}`);
-                  }}
-                >
-                  {game.numPlayers < 4 ? 'JOIN' : 'SPECTATE'}
-                </SBButton>
+          {!games.length && (
+            <Col>
+              <div className={styles.noGames}>
+                No games found. Create a game!
               </div>
             </Col>
-          ))}
+          )}
+          {games.map(game => {
+            const color = sample([
+              'red',
+              'purple',
+              'blue',
+              'yellow',
+              'green',
+              'cyan',
+            ]) as string;
+
+            return (
+              <Col xs={6} key={game.id} className={styles.game}>
+                <div className={cx(styles.gameHeader, styles[color])}>
+                  <div className={styles.gameTitle}>{game.name}</div>
+                  <div className={styles.gameInfo}>
+                    <div className="mr-5">
+                      <FontAwesomeIcon icon="user-friends" className="mr-2" />
+                      {game.numPlayers}
+                      /4
+                    </div>
+                    <div>
+                      <FontAwesomeIcon icon="fingerprint" className="mr-2" />
+                      {game.id}
+                    </div>
+                  </div>
+                </div>
+                <div className={cx(styles.gameActions, 'float-right')}>
+                  <SBButton
+                    onClick={() => {
+                      history.push(`/game/lobby/${game.id}`);
+                    }}
+                    outline
+                    color={color}
+                  >
+                    {game.numPlayers < 4 ? 'JOIN' : 'SPECTATE'}
+                  </SBButton>
+                </div>
+              </Col>
+            );
+          })}
         </Row>
       </div>
     </div>

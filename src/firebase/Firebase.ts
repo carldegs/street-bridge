@@ -95,10 +95,10 @@ class Firebase {
     }
   };
 
-  createGame = async (username: string) => {
+  createGame = async (username: string, name: string) => {
     try {
       const game: Game = {
-        name: '',
+        name,
         players: [username],
         playerInfo: {
           [username]: {
@@ -413,6 +413,33 @@ class Firebase {
   deleteGame = async (gameId: string) => {
     try {
       const res = await this.games.doc(gameId).delete();
+      return res;
+    } catch (err) {
+      return err;
+    }
+  };
+
+  resetGame = async (gameId: string, players: string[]) => {
+    try {
+      const playerInfoArr = players.map(username => ({
+        [`playerInfo.${username}.bid.suit`]: BidSuit.none,
+        [`playerInfo.${username}.bid.value`]: 1,
+        [`playerInfo.${username}.cards`]: [],
+      }));
+
+      const res = await this.games.doc(gameId).update({
+        ...Object.assign({}, ...playerInfoArr.map(i => i)),
+        phase: Phase.lobby,
+        winBid: null,
+        winTeam: null,
+        winPlayer: null,
+        currPlayer: 0,
+        score: [0, 0],
+        bids: [],
+        currRound: 0,
+        rounds: [],
+      });
+
       return res;
     } catch (err) {
       return err;
