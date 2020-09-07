@@ -17,7 +17,6 @@ import RoundsSummary from '../../components/RoundsSummary/RoundsSummary';
 
 import styles from './GamePlay.module.scss';
 import useGameDetails from './useGameDetails';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const GamePlay: React.FC = () => {
   const history = useHistory();
