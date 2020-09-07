@@ -18,6 +18,7 @@ interface IGameDetail {
   left: PlayerTableDetail;
   right: PlayerTableDetail;
   top: PlayerTableDetail;
+  bottom: PlayerTableDetail;
   teamColor?: TeamColor;
   enemyColor?: TeamColor;
   currPlayer?: string;
@@ -31,6 +32,7 @@ interface IGameDetail {
   currBid?: Bid;
   bidColor: TeamColor;
   gameWinner?: TeamColor;
+  isSpectator: boolean;
 }
 
 const getTeamColor = (team: number) => (team === 0 ? 'Red' : 'Blue');
@@ -57,11 +59,17 @@ const useGameDetails = (id: string): IGameDetail => {
       color: 'Blue',
       isCurrPlayer: false,
     },
+    bottom: {
+      username: '',
+      color: 'Red',
+      isCurrPlayer: false,
+    },
     currPlayerColor: 'Red',
     isFirstPlayer: false,
     roundSuit: BidSuit.noTrump,
     isHost: false,
     bidColor: 'Red',
+    isSpectator: false,
   });
 
   useEffect(() => {
@@ -78,13 +86,19 @@ const useGameDetails = (id: string): IGameDetail => {
     const { displayName } = authUser;
 
     if (players?.length === 4 && displayName) {
-      const authUserPosition = players.indexOf(displayName);
+      let authUserPosition = players.indexOf(displayName);
+      const isSpectator = authUserPosition === -1;
 
+      if (isSpectator) {
+        authUserPosition = 0;
+      }
+
+      const bottomPlayer = players[authUserPosition % 4];
       const leftPlayer = players[(authUserPosition + 1) % 4];
       const topPlayer = players[(authUserPosition + 2) % 4];
       const rightPlayer = players[(authUserPosition + 3) % 4];
 
-      const { team } = playerInfo[displayName];
+      const { team } = playerInfo[bottomPlayer] || {};
       const teamColor = getTeamColor(team);
       const enemyColor = getTeamColor(team === 0 ? 1 : 0);
 
@@ -162,6 +176,12 @@ const useGameDetails = (id: string): IGameDetail => {
           isCurrPlayer: rightPlayer === currPlayer,
           card: currRound ? (currRound[rightPlayer] as Card) : undefined,
         },
+        bottom: {
+          username: bottomPlayer,
+          color: teamColor,
+          isCurrPlayer: bottomPlayer === currPlayer,
+          card: currRound ? (currRound[bottomPlayer] as Card) : undefined,
+        },
         teamColor,
         enemyColor,
         currPlayer,
@@ -177,6 +197,7 @@ const useGameDetails = (id: string): IGameDetail => {
         currBid: winBid || undefined,
         bidColor,
         gameWinner: gameWinner ? (gameWinner as TeamColor) : undefined,
+        isSpectator,
       });
     }
   }, [game, authUser]);

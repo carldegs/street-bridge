@@ -14,6 +14,9 @@ export const createCard = (
   };
 };
 
+export const isDeckMisdeal = (deck: Card[][]): boolean =>
+  deck.some(cards => !cards.some(card => card.value >= 9));
+
 export const createSplitDeck = (): Card[][] => {
   let cards: Card[] = [];
   Object.keys(CardSuit)
@@ -29,7 +32,12 @@ export const createSplitDeck = (): Card[][] => {
       });
     });
 
-  return chunk(shuffle(cards), 13);
+  let splitDeck = chunk(shuffle(cards), 13);
+  while (isDeckMisdeal(splitDeck)) {
+    splitDeck = chunk(shuffle(cards), 13);
+  }
+
+  return splitDeck;
 };
 
 export const getCardValue = (value: number): string => {

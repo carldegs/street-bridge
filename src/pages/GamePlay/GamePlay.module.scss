@@ -208,6 +208,20 @@
 
 .settings {
   position: fixed;
-  right: 16px;
-  bottom: 16px;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spectatorText {
+  width: fit-content;
+  padding: 4px 24px;
+  background-color: $dark1;
+  color: $light;
+  border-radius: 24px;
+  font-size: 16px;
+  font-family: IBM Plex Serif;
+  text-align: center;
 }

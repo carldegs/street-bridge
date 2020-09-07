@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import cx from 'classnames';
-import { useParams, Link, useHistory } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import { Col, Row, Modal } from 'react-bootstrap';
 import { sortBy } from 'lodash';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useGame } from '../../firebase/hooks';
 import { useFirebase } from '../../firebase/useFirebase';
@@ -12,7 +13,6 @@ import { Card, BidSuit, Phase } from '../../models';
 import CardComponent from '../../components/CardComponent/CardComponent';
 import SBButton from '../../components/SBButton/SBButton';
 import { getSuitString } from '../../utils/cards';
-
 import RoundsSummary from '../../components/RoundsSummary/RoundsSummary';
 
 import styles from './GamePlay.module.scss';
@@ -27,6 +27,8 @@ const GamePlay: React.FC = () => {
   const auth = useAuth();
   const authUser = auth.state.authUser || { displayName: '' };
   const [showStopModal, setShowStopModal] = useState(false);
+  const [showOptionsModal, setShowOptionsModal] = useState(false);
+  const [showRecapModal, setShowRecapModal] = useState(false);
 
   const cards: Card[] = useMemo(() => {
     if (authUser.displayName) {
@@ -41,9 +43,14 @@ const GamePlay: React.FC = () => {
       <Modal show={gameError === 'no-game' && game.phase !== Phase.post}>
         <Modal.Header>Game Stopped</Modal.Header>
         <Modal.Footer>
-          <Link to="/home">
-            <SBButton>Back to Lobby</SBButton>
-          </Link>
+          <SBButton
+            onClick={() => {
+              auth.setAuthUserGame(null);
+              history.push('/home');
+            }}
+          >
+            Back to Lobby
+          </SBButton>
         </Modal.Footer>
       </Modal>
       <Modal show={showStopModal} onHide={() => setShowStopModal(false)}>
@@ -108,9 +115,9 @@ const GamePlay: React.FC = () => {
             onClick={() => {
               if (gameError !== 'no-game') {
                 firebase.deleteGame(id);
-                auth.setAuthUserGame(null);
               }
 
+              auth.setAuthUserGame(null);
               history.push('/home');
             }}
           >
@@ -120,6 +127,83 @@ const GamePlay: React.FC = () => {
               : 'Waiting for host...'}
           </SBButton>
         </Modal.Footer>
+      </Modal>
+      <Modal
+        size="xl"
+        show={showRecapModal}
+        onHide={() => setShowRecapModal(false)}
+      >
+        <Modal.Header closeButton>
+          <div
+            className={styles.postHeader}
+            style={{ marginLeft: '32px', fontSize: '42px' }}
+          >
+            Recap
+          </div>
+        </Modal.Header>
+        <Modal.Body className="d-flex flex-column justify-content-center">
+          <Row>
+            <Col className={styles.redScore}>
+              {game?.score?.length ? game.score[0] : 0}
+              <div className={styles.subtitle}>
+                {playersTable.scoresToWin
+                  ? `${playersTable.scoresToWin[0]} to win`
+                  : 'N/A'}
+              </div>
+            </Col>
+            <Col className={styles.blueScore}>
+              {game?.score?.length ? game.score[1] : 0}
+              <div className={styles.subtitle}>
+                {playersTable.scoresToWin
+                  ? `${playersTable.scoresToWin[1]} to win`
+                  : 'N/A'}
+              </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col className="mx-5 my-4">
+              <RoundsSummary rounds={game?.rounds} players={game?.playerInfo} />
+            </Col>
+          </Row>
+        </Modal.Body>
+      </Modal>
+      <Modal
+        size="sm"
+        show={showOptionsModal}
+        onHide={() => setShowOptionsModal(false)}
+      >
+        <Modal.Header closeButton />
+        <Modal.Body className="d-flex flex-column align-items-center justify-content-center mb-4">
+          <span
+            style={{ fontWeight: 'bold', fontSize: '24px', marginTop: '-36px' }}
+          >
+            OPTIONS
+          </span>
+          <SBButton
+            outline
+            color="cyan"
+            className="mt-3"
+            onClick={() => {
+              setShowOptionsModal(false);
+              setShowRecapModal(true);
+            }}
+          >
+            RECAP
+          </SBButton>
+          {playersTable.isHost && (
+            <SBButton
+              outline
+              color="red"
+              className="mt-3"
+              onClick={() => {
+                setShowOptionsModal(false);
+                setShowStopModal(true);
+              }}
+            >
+              STOP GAME
+            </SBButton>
+          )}
+        </Modal.Body>
       </Modal>
       <Row className="d-flex d-md-none">
         <Col className={styles.smallInfo}>
@@ -221,7 +305,7 @@ const GamePlay: React.FC = () => {
                   [styles[`rightBox${playersTable.enemyColor}`]]:
                     playersTable.right.isCurrPlayer,
                   [styles[`bottomBox${playersTable.teamColor}`]]:
-                    playersTable.currPlayer === authUser.displayName,
+                    playersTable.bottom.isCurrPlayer,
                   [styles[
                     `win${playersTable.roundWinner}`
                   ]]: !!playersTable.roundWinner,
@@ -253,7 +337,7 @@ const GamePlay: React.FC = () => {
               <Row className="w-100" style={{ height: '140px' }}>
                 <Col className="d-flex justify-content-center">
                   <CardComponent
-                    card={playersTable.currPlayerCard}
+                    card={playersTable.bottom.card}
                     className={styles.tableCardBottom}
                   />
                 </Col>
@@ -272,10 +356,10 @@ const GamePlay: React.FC = () => {
             <div
               className={cx(styles.bottomPlayer, {
                 [styles[`text${playersTable.teamColor}`]]:
-                  playersTable.currPlayer === authUser.displayName,
+                  playersTable.bottom.isCurrPlayer,
               })}
             >
-              {authUser.displayName}
+              {playersTable.bottom.username}
             </div>
           </div>
         </Col>
@@ -303,40 +387,37 @@ const GamePlay: React.FC = () => {
       </Row>
       <Row className="w-100">
         <Col>
-          <Cards
-            cards={cards}
-            disabled={
-              playersTable.currPlayer !== authUser.displayName ||
-              !!playersTable.currPlayerCard
-            }
-            onClick={card => {
-              if (authUser.displayName) {
-                firebase.playCard(id, authUser.displayName, card);
+          {!playersTable.isSpectator && (
+            <Cards
+              cards={cards}
+              disabled={
+                playersTable.currPlayer !== authUser.displayName ||
+                !!playersTable.currPlayerCard
               }
-            }}
-            isFirstPlayer={playersTable.isFirstPlayer}
-            roundSuit={playersTable.roundSuit}
-          />
+              onClick={card => {
+                if (authUser.displayName) {
+                  firebase.playCard(id, authUser.displayName, card);
+                }
+              }}
+              isFirstPlayer={playersTable.isFirstPlayer}
+              roundSuit={playersTable.roundSuit}
+            />
+          )}
         </Col>
       </Row>
       <div className={styles.settings}>
-        {/* {playersTable.isHost && (
-          <SBButton outline color="cyan">
-            <FontAwesomeIcon icon="cog" />
-          </SBButton>
-        )} */}
-        {playersTable.isHost && (
-          <SBButton
-            outline
-            color="red"
-            className="mt-3"
-            onClick={() => {
-              setShowStopModal(true);
-            }}
-          >
-            STOP GAME
-          </SBButton>
+        {playersTable.isSpectator && (
+          <div className={cx(styles.spectatorText, 'mr-3')}>Spectating</div>
         )}
+        <SBButton
+          outline
+          color="cyan"
+          onClick={() => {
+            setShowOptionsModal(true);
+          }}
+        >
+          <FontAwesomeIcon icon="ellipsis-h" />
+        </SBButton>
       </div>
     </div>
   );
