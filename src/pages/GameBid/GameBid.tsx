@@ -1,15 +1,15 @@
 /* eslint-disable no-shadow */
 import React, { useEffect, useMemo, useState } from 'react';
 import cx from 'classnames';
-import { useParams, Link } from 'react-router-dom';
-import { Row, Col } from 'react-bootstrap';
+import { useParams, useHistory } from 'react-router-dom';
+import { Row, Col, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { range, sortBy } from 'lodash';
 
 import { useGame } from '../../firebase/hooks';
 import { useFirebase } from '../../firebase/useFirebase';
 import { getSuitString } from '../../utils/cards';
-import { BidSuit, Card } from '../../models';
+import { BidSuit, Card, Phase } from '../../models';
 import SBButton from '../../components/SBButton/SBButton';
 import { toBidsArray, getScoreToWin } from '../../utils/bids';
 import Cards from '../../components/Cards/Cards';
@@ -21,13 +21,16 @@ const getColor = (team: number): 'Red' | 'Blue' =>
   team === 0 ? 'Red' : 'Blue';
 
 const GameBid: React.FC = () => {
+  const history = useHistory();
   const { id } = useParams();
-  const { game } = useGame(id);
+  const { game, error: gameError } = useGame(id);
   const firebase = useFirebase();
   const auth = useAuth();
   const authUser = auth.state.authUser || { displayName: '' };
   const [bidValue, setBidValue] = useState<number | null>(null);
   const [bidSuit, setBidSuit] = useState<BidSuit | null>(null);
+  const [showOptionsModal, setShowOptionsModal] = useState(false);
+  const [showPlayersModal, setShowPlayersModal] = useState(false);
 
   const { currBid, currBidTeam, scoreToWin, currPlayer, bids } = useMemo(() => {
     const currBid = game.winBid;
@@ -115,6 +118,98 @@ const GameBid: React.FC = () => {
 
   return (
     <div className={styles.GameBid}>
+      <Modal show={gameError === 'no-game' && game.phase !== Phase.post}>
+        <Modal.Header>Game Stopped</Modal.Header>
+        <Modal.Footer>
+          <SBButton
+            onClick={() => {
+              auth.setAuthUserGame(null);
+              history.push('/home');
+            }}
+          >
+            Back to Lobby
+          </SBButton>
+        </Modal.Footer>
+      </Modal>
+      <Modal show={showPlayersModal} onHide={() => setShowPlayersModal(false)}>
+        <Modal.Header closeButton />
+        <Modal.Body className="d-flex flex-column align-items-center justify-content-center mb-4">
+          <span
+            style={{ fontSize: '24px', marginTop: '-36px' }}
+            className="mb-2 font-weight-bold"
+          >
+            PLAYERS
+          </span>
+          {!!game?.players &&
+            !!game?.playerInfo &&
+            game.players
+              .map(player => game.playerInfo[player])
+              .map(playerInfo => (
+                <div
+                  className={cx(
+                    'mt-1',
+                    'font-weight-bold',
+                    styles[`text${playerInfo.team === 0 ? 'Red' : 'Blue'}`]
+                  )}
+                  style={{ fontSize: '20px' }}
+                  key={playerInfo.username}
+                >
+                  {playerInfo.username}
+                </div>
+              ))}
+        </Modal.Body>
+      </Modal>
+      <Modal
+        size="sm"
+        show={showOptionsModal}
+        onHide={() => setShowOptionsModal(false)}
+      >
+        <Modal.Header closeButton />
+        <Modal.Body className="d-flex flex-column align-items-center justify-content-center mb-4">
+          <span
+            style={{ fontWeight: 'bold', fontSize: '24px', marginTop: '-36px' }}
+          >
+            OPTIONS
+          </span>
+          <SBButton
+            outline
+            color="cyan"
+            className="mt-3"
+            onClick={() => {
+              setShowOptionsModal(false);
+              setShowPlayersModal(true);
+            }}
+          >
+            PLAYERS
+          </SBButton>
+          {!isAuthUserAPlayer && (
+            <SBButton
+              outline
+              color="cyan"
+              onClick={() => {
+                auth.setAuthUserGame(null);
+                history.push('/home');
+              }}
+              className="mt-3"
+            >
+              BACK TO LOBBY
+            </SBButton>
+          )}
+          {isAuthUserAHost && (
+            <SBButton
+              outline
+              color="red"
+              onClick={() => {
+                firebase.deleteGame(id);
+                auth.setAuthUserGame(null);
+              }}
+              className="mt-3"
+            >
+              STOP GAME
+            </SBButton>
+          )}
+        </Modal.Body>
+      </Modal>
       <Row className="d-flex d-md-none mx-5">
         <Col xs={6}>
           <div>Current Bid</div>
@@ -309,30 +404,20 @@ const GameBid: React.FC = () => {
         </Col>
       </Row>
       <Cards cards={cards} />
-      <Row style={{ width: '100%' }}>
-        <Col className="d-flex align-items-center mt-3 ml-3">
-          {!isAuthUserAPlayer && (
-            <Link to="/home">
-              <SBButton outline color="cyan">
-                BACK TO LOBBY
-              </SBButton>
-            </Link>
-          )}
-          {isAuthUserAHost && (
-            <SBButton
-              outline
-              color="red"
-              onClick={() => {
-                firebase.deleteGame(id);
-                auth.setAuthUserGame(null);
-              }}
-              className="mt-3"
-            >
-              STOP GAME
-            </SBButton>
-          )}
-        </Col>
-      </Row>
+      <div className={styles.settings}>
+        {!isAuthUserAPlayer && (
+          <div className={cx(styles.spectatorText, 'mr-3')}>Spectating</div>
+        )}
+        <SBButton
+          outline
+          color="cyan"
+          onClick={() => {
+            setShowOptionsModal(true);
+          }}
+        >
+          <FontAwesomeIcon icon="ellipsis-h" />
+        </SBButton>
+      </div>
     </div>
   );
 };

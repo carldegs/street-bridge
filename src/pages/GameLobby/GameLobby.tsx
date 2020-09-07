@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect } from 'react';
-import { useParams, Link, useHistory } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import { Row, Col, Button, Badge, Modal, Container } from 'react-bootstrap';
 import { range } from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,7 +11,6 @@ import { Phase } from '../../models';
 import { useAuth } from '../../store/useAuth';
 
 import styles from './GameLobby.module.scss';
-
 // TODO: Change how the host is determined
 const GameLobby: React.FC = () => {
   const history = useHistory();
@@ -61,9 +60,15 @@ const GameLobby: React.FC = () => {
       <Modal show={gameError === 'no-game'}>
         <Modal.Header>Game Deleted</Modal.Header>
         <Modal.Footer>
-          <Link to="/home">
-            <Button>Back to Lobby</Button>
-          </Link>
+          <Button
+            onClick={() => {
+              auth.setAuthUserGame(null);
+              history.push('/home');
+            }}
+          >
+            {' '}
+            Back to Lobby
+          </Button>
         </Modal.Footer>
       </Modal>
 
@@ -74,17 +79,24 @@ const GameLobby: React.FC = () => {
       <Row>
         <Col sm={2} className={styles.left}>
           {!currUserGameInfo ? (
-            <Link to="/home">
-              <SBButton outline color="cyan">
-                BACK TO LOBBY
-              </SBButton>
-            </Link>
+            <SBButton
+              outline
+              color="cyan"
+              onClick={() => {
+                auth.setAuthUserGame(null);
+                history.push('/home');
+              }}
+            >
+              BACK TO LOBBY
+            </SBButton>
           ) : (
             <SBButton
               outline
               color="cyan"
               onClick={() => {
                 firebase.leaveGame(id, authUser?.displayName || '');
+                auth.setAuthUserGame(null);
+                history.push('/home');
               }}
             >
               LEAVE GAME

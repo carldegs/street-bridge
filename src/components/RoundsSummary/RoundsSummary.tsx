@@ -7,6 +7,8 @@ import { Row, Col } from 'react-bootstrap';
 import { Round, PlayerInfo, Card } from '../../models';
 import CardComponent from '../CardComponent/CardComponent';
 
+import objToArr from '../../utils/array';
+
 import styles from './RoundsSummary.module.scss';
 
 interface IRoundsSummary {
@@ -23,9 +25,7 @@ const RoundsSummary: React.FC<IRoundsSummary> = ({
       return [];
     }
 
-    return Object.entries(rounds)
-      .sort((entryA, entryB) => Number(entryA[0]) - Number(entryB[0]))
-      .map(entry => entry[1]);
+    return objToArr(rounds);
   }, [rounds]);
 
   const playerNames = useMemo(() => Object.keys(players || {}), [players]);
