@@ -34,16 +34,16 @@ export const createSplitDeck = (): Card[][] => {
 
 export const getCardValue = (value: number): string => {
   switch (value) {
-    case 0:
-      return 'A';
-    case 10:
+    case 9:
       return 'J';
-    case 11:
+    case 10:
       return 'Q';
-    case 12:
+    case 11:
       return 'K';
+    case 12:
+      return 'A';
     default:
-      return `${value + 1}`;
+      return `${value + 2}`;
   }
 };
 

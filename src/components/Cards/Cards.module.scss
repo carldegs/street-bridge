@@ -5,6 +5,8 @@
   display: flex;
   justify-content: center;
   margin-top: 24px;
+  margin: 24px 0;
+  padding: 24px 0;
 
   &.disabled {
     opacity: 0.8;
@@ -23,6 +25,10 @@
   transition: margin-left 0.3s, margin-right 0.3s, transform 0.3s;
   transition-delay: 0.05s, 0.05s, 0.05s;
   cursor: pointer;
+
+  &:first-child {
+    margin-left: 0;
+  }
 
   &:hover {
     margin-left: 16px !important;

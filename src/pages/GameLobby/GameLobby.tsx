@@ -44,7 +44,7 @@ const GameLobby: React.FC = () => {
         }
       });
 
-      return [teamA, teamB];
+      return [teamA.filter(a => !!a), teamB.filter(b => !!b)];
     }
 
     return [[], []];

@@ -6,6 +6,7 @@ import {
   faUserFriends,
   faPlay,
   faSpinner,
+  faCog,
 } from '@fortawesome/free-solid-svg-icons';
 
 const setupFALibrary = (): void =>
@@ -15,7 +16,8 @@ const setupFALibrary = (): void =>
     faUserFriends,
     faPlay,
     faSpinner,
-    faCodeBranch
+    faCodeBranch,
+    faCog
   );
 
 export default setupFALibrary;

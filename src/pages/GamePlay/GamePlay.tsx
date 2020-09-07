@@ -17,6 +17,7 @@ import RoundsSummary from '../../components/RoundsSummary/RoundsSummary';
 
 import styles from './GamePlay.module.scss';
 import useGameDetails from './useGameDetails';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const GamePlay: React.FC = () => {
   const history = useHistory();
@@ -121,10 +122,52 @@ const GamePlay: React.FC = () => {
           </SBButton>
         </Modal.Footer>
       </Modal>
+      <Row className="d-flex d-md-none">
+        <Col className={styles.smallInfo}>
+          <div className={styles.subtitle}>Current Bid:</div>
+          <div
+            className={cx(
+              styles.bidInfo,
+              styles[`text${playersTable.bidColor}`]
+            )}
+          >
+            {playersTable?.currBid?.value ? (
+              <>
+                {playersTable?.currBid.suit !== BidSuit.pass
+                  ? playersTable?.currBid.value
+                  : ''}
+                <span className="font-weight-bold">
+                  {getSuitString(playersTable?.currBid.suit)}
+                </span>
+              </>
+            ) : (
+              'N/A'
+            )}
+          </div>
+        </Col>
+        <Col className={styles.smallInfo}>
+          <div className={styles.redScore}>
+            {game?.score?.length ? game.score[0] : 0}
+            <div className={styles.subtitle}>
+              {playersTable.scoresToWin
+                ? `/${playersTable.scoresToWin[0]}`
+                : 'N/A'}
+            </div>
+          </div>
+          <div className={styles.blueScore}>
+            {game?.score?.length ? game.score[1] : 0}
+            <div className={styles.subtitle}>
+              {playersTable.scoresToWin
+                ? `/${playersTable.scoresToWin[1]}`
+                : 'N/A'}
+            </div>
+          </div>
+        </Col>
+      </Row>
       <Row style={{ width: '100%' }}>
         <Col
           sm={2}
-          className="d-flex flex-column align-items-center justify-content-center"
+          className="d-none d-md-flex flex-column align-items-center justify-content-center"
         >
           <div
             className={cx(
@@ -239,7 +282,7 @@ const GamePlay: React.FC = () => {
         </Col>
         <Col
           sm={2}
-          className="d-flex flex-column align-items-center justify-content-center"
+          className="d-none d-md-flex flex-column align-items-center justify-content-center"
         >
           <div className={styles.redScore}>
             {game?.score?.length ? game.score[0] : 0}
@@ -260,20 +303,6 @@ const GamePlay: React.FC = () => {
         </Col>
       </Row>
       <Row className="w-100">
-        <Col xs={2} className="d-flex align-items-center mt-3 ml-3">
-          {playersTable.isHost && (
-            <SBButton
-              outline
-              color="red"
-              className="mt-3"
-              onClick={() => {
-                setShowStopModal(true);
-              }}
-            >
-              STOP GAME
-            </SBButton>
-          )}
-        </Col>
         <Col>
           <Cards
             cards={cards}
@@ -290,8 +319,26 @@ const GamePlay: React.FC = () => {
             roundSuit={playersTable.roundSuit}
           />
         </Col>
-        <Col xs={1} />
       </Row>
+      <div className={styles.settings}>
+        {/* {playersTable.isHost && (
+          <SBButton outline color="cyan">
+            <FontAwesomeIcon icon="cog" />
+          </SBButton>
+        )} */}
+        {playersTable.isHost && (
+          <SBButton
+            outline
+            color="red"
+            className="mt-3"
+            onClick={() => {
+              setShowStopModal(true);
+            }}
+          >
+            STOP GAME
+          </SBButton>
+        )}
+      </div>
     </div>
   );
 };

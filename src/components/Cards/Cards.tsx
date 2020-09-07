@@ -51,11 +51,12 @@ const Cards: React.FC<ICards> = ({
 }: ICards) => {
   const finalCards = cards.filter(card => card.turnUsed === -1);
   return (
-    <Row style={{ width: '100%' }}>
+    <Row style={{ width: '100%', margin: 0, justifyContent: 'center' }}>
       <Col
         className={cx(styles.cards, {
           [styles.disabled]: !!disabled,
         })}
+        style={{ maxWidth: `${68 * (finalCards.length + 0.5)}px` }}
       >
         {finalCards.map((card, i) => {
           const isDisabled = !checkIfCardPlayable(

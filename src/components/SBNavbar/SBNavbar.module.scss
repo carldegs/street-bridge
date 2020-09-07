@@ -1,25 +1,27 @@
 @import '../../scss/constants.scss';
 
+$navbar-height: 60px;
+
 .SBNavbar {
   padding: 0 16px;
-  height: 82px;
+  height: $navbar-height;
   width: 100%;
 
   .logo {
     .street {
-      font-size: 38px;
+      font-size: 24px;
       font-family: 'IBM Plex Sans';
       font-style: italic;
       font-weight: bold;
     }
 
     .bridge {
-      font-size: 45px;
+      font-size: 32px;
       font-family: 'IBM Plex Serif';
       font-style: italic;
       font-weight: bold;
       color: $red;
-      margin-top: -42px;
+      margin-top: -26px;
       margin-left: 18px;
     }
   }
@@ -44,6 +46,6 @@
 
 .children {
   width: 100%;
-  height: calc(100vh - 82px);
+  height: calc(100vh - $navbar-height);
   overflow-y: auto;
 }

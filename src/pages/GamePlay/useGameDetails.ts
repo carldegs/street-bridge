@@ -116,7 +116,8 @@ const useGameDetails = (id: string): IGameDetail => {
         const firstTurnPlayer =
           currRoundNum > 0
             ? rounds[prevRoundNum].winningPlayer || undefined
-            : winPlayer || undefined;
+            : players[(players.indexOf(winPlayer as string) + 1) % 4] ||
+              undefined;
 
         if (firstTurnPlayer && currRound) {
           const firstPlayerRound = currRound[firstTurnPlayer] as Card;
