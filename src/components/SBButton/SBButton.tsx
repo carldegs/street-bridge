@@ -5,7 +5,15 @@ import styles from './SBButton.module.scss';
 
 interface ISBButton {
   outline?: boolean;
-  color?: 'red' | 'purple' | 'blue' | 'yellow' | 'green' | 'cyan' | 'white';
+  color?:
+    | 'red'
+    | 'purple'
+    | 'blue'
+    | 'yellow'
+    | 'green'
+    | 'cyan'
+    | 'white'
+    | string;
   className?: string;
   children: any;
   onClick?: (e: Event) => void;

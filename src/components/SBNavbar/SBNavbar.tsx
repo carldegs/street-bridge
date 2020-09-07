@@ -24,14 +24,18 @@ const SBNavbar: React.FC<ISBNavbar> = ({ children, title }: ISBNavbar) => {
           <div className={styles.bridge}>Bridge</div>
         </Col>
         <Col className={styles.pageTitle}>{title}</Col>
-        <Col className={cx(styles.logout, 'float-right')}>
+        <Col className="d-flex align-items-center justify-content-end">
           <div
+            className={cx(styles.logout, 'float-right')}
             onClick={() => {
               firebase.logoutUser();
               auth.logout();
             }}
           >
-            Logout
+            <div className={styles.username}>
+              {auth.state?.authUser?.displayName || ''}
+            </div>
+            <div className={styles.logoutButton}>LOGOUT</div>
           </div>
         </Col>
       </Row>

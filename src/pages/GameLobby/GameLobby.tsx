@@ -72,10 +72,10 @@ const GameLobby: React.FC = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* <div className={styles.title}>
-        <div className={styles.gameName}>{name || id}</div>
+      <div className={styles.title}>
+        <div className={styles.gameName}>{game?.name || id}</div>
         <div className={styles.phase}>Lobby</div>
-      </div> */}
+      </div>
       <Row>
         <Col sm={2} className={styles.left}>
           {!currUserGameInfo ? (
@@ -138,7 +138,7 @@ const GameLobby: React.FC = () => {
               {teamAPlayers.map(username => (
                 <p key={username}>
                   {username === players[0] && (
-                    <Badge className="mr-2" variant="secondary" pill>
+                    <Badge className="mx-2" variant="secondary" pill>
                       Host
                     </Badge>
                   )}
@@ -177,7 +177,9 @@ const GameLobby: React.FC = () => {
                 <p key={username}>
                   {username}
                   {username === players[0] && (
-                    <Badge variant="secondary">Host</Badge>
+                    <Badge variant="secondary" className="mx-2">
+                      Host
+                    </Badge>
                   )}
                 </p>
               ))}

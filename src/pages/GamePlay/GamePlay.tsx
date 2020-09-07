@@ -108,9 +108,22 @@ const GamePlay: React.FC = () => {
           </Row>
         </Modal.Body>
         <Modal.Footer>
+          {playersTable.isHost && (
+            <SBButton
+              outline
+              color="cyan"
+              className="mr-2"
+              onClick={() => {
+                firebase.resetGame(id, game.players);
+                history.push(`/game/lobby/${id}`);
+              }}
+            >
+              Play Again
+            </SBButton>
+          )}
           <SBButton
             outline
-            color="green"
+            color="red"
             disabled={!playersTable.isHost && gameError !== 'no-game'}
             onClick={() => {
               if (gameError !== 'no-game') {

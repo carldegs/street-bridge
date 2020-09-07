@@ -67,7 +67,8 @@ const ProtectedRoute: React.FC<IProtectedRoute> = ({
       name === 'Game Lobby' ||
       name === 'Bidding' ||
       name === 'Gameplay' ||
-      name === 'Home Page'
+      name === 'Home Page' ||
+      name === 'Results'
     ) {
       let phase = Phase.post;
 
@@ -87,6 +88,9 @@ const ProtectedRoute: React.FC<IProtectedRoute> = ({
             break;
           case 'Gameplay':
             phase = Phase.game;
+            break;
+          case 'Results':
+            phase = Phase.post;
             break;
           default:
             phase = -1;
