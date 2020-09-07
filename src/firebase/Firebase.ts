@@ -427,19 +427,6 @@ class Firebase {
         [`playerInfo.${username}.cards`]: [],
       }));
 
-      console.log('reset', {
-        ...Object.assign({}, ...playerInfoArr.map(i => i)),
-        phase: Phase.lobby,
-        winBid: null,
-        winTeam: null,
-        winPlayer: null,
-        currPlayer: 0,
-        score: [0, 0],
-        bids: [],
-        currRound: 0,
-        rounds: [],
-      });
-
       const res = await this.games.doc(gameId).update({
         ...Object.assign({}, ...playerInfoArr.map(i => i)),
         phase: Phase.lobby,
