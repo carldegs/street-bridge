@@ -46,6 +46,6 @@ $navbar-height: 60px;
 
 .children {
   width: 100%;
-  height: calc(100vh - $navbar-height);
+  height: calc(100vh - 60px);
   overflow-y: auto;
 }

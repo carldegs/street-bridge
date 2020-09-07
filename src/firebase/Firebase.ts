@@ -9,6 +9,7 @@ import { sample, range } from 'lodash';
 import { Game, BidSuit, Phase, Bid, Card, CardSuit } from '../models';
 import { createSplitDeck } from '../utils/cards';
 import { getScoreToWin } from '../utils/bids';
+import objToArr from '../utils/array';
 
 const config = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -223,9 +224,17 @@ class Firebase {
 
           const data = getGame.data() as Game;
           const numBids = Object.keys(data.bids).length;
-          const numPass = Object.values(data.playerInfo).filter(
-            info => info.username !== username && info.bid.suit === BidSuit.pass
-          ).length;
+          const bidsArr = objToArr(data.bids);
+
+          let numPass = 0;
+          // eslint-disable-next-line no-plusplus
+          for (let b = bidsArr.length - 1; b >= 0; b--) {
+            if (bidsArr[b].suit === BidSuit.pass) {
+              numPass += 1;
+            } else {
+              break;
+            }
+          }
 
           let currPlayer = (data.currPlayer + 1) % 4;
 
