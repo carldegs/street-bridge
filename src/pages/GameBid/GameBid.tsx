@@ -115,10 +115,43 @@ const GameBid: React.FC = () => {
 
   return (
     <div className={styles.GameBid}>
+      <Row className="d-flex d-md-none mx-5">
+        <Col xs={6}>
+          <div>Current Bid</div>
+          <div className={cx(styles[`text${getColor(currBidTeam || 0)}`])}>
+            {currBid?.value ? (
+              <>
+                {currBid.suit !== BidSuit.pass ? currBid.value : ''}
+                <span className="font-weight-bold">
+                  {getSuitString(currBid.suit)}
+                </span>
+              </>
+            ) : (
+              'N/A'
+            )}
+          </div>
+        </Col>
+        <Col xs={6}>
+          <div>Score to Win</div>
+          {scoreToWin ? (
+            <div className="d-flex">
+              <div className={cx(styles.textRed, 'font-weight-bold')}>
+                {scoreToWin[0]}
+              </div>
+              {` - `}
+              <div className={cx(styles.textBlue, 'font-weight-bold')}>
+                {scoreToWin[1]}
+              </div>
+            </div>
+          ) : (
+            'N/A'
+          )}
+        </Col>
+      </Row>
       <Row className={styles.bid}>
         <Col
-          sm={2}
-          className="d-flex flex-column align-items-center justify-content-center"
+          md={3}
+          className="d-none d-md-flex flex-column align-items-center justify-content-center"
         >
           <div
             className={cx(
@@ -254,8 +287,8 @@ const GameBid: React.FC = () => {
           </div>
         </Col>
         <Col
-          sm={2}
-          className="d-flex flex-column align-items-center justify-content-center"
+          sm={3}
+          className="d-none d-md-flex flex-column align-items-center justify-content-center"
         >
           <div className={cx(styles.bidInfo)}>
             {scoreToWin ? (

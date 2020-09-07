@@ -30,8 +30,8 @@
   }
 
   .table {
-    width: 550px;
-    height: 550px;
+    width: 500px;
+    height: 500px;
     background-color: $dark1;
     border-radius: 64px;
     text-align: center;
@@ -132,13 +132,43 @@
   color: $blue !important;
 }
 
-
 .bidInfo {
   font-family: IBM Plex Sans;
   font-style: normal;
   font-weight: 300;
   font-size: 90px;
   color: $dark0;
+}
+
+.smallInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  .bidInfo {
+    display: flex;
+    font-size: 42px;
+    margin-left: 14px;
+  }
+
+  .subtitle {
+    color: $light;
+  }
+
+  .redScore,
+  .blueScore {
+    font-size: 42px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 8px;
+
+    .subtitle {
+      margin: 8px 0 0 2px;
+    }
+  }
 }
 
 .redScore,
@@ -174,4 +204,10 @@
   font-size: 64px;
   color: $dark0;
   text-align: center;
+}
+
+.settings {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
 }
