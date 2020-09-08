@@ -35,12 +35,12 @@ const Home: React.FC = () => {
         }}
       >
         <Modal.Header closeButton>
-          <div className={styles.gameNameModalTitle}>Create Game</div>
+          <div className={styles.gameNameModalTitle}>Create Room</div>
         </Modal.Header>
         <Modal.Body>
           <Form.Group controlId="gameName">
             <Form.Label className={styles.gameNameModalLabel}>
-              Game Name
+              Room Name
             </Form.Label>
             <Form.Control
               value={gameName}
@@ -65,7 +65,7 @@ const Home: React.FC = () => {
               history.push(`/game/lobby/${id}`);
             }}
           >
-            CREATE GAME
+            CREATE ROOM
           </SBButton>
         </Modal.Footer>
       </Modal>
@@ -78,7 +78,7 @@ const Home: React.FC = () => {
               onClick={() => setShowNameModal(true)}
             >
               <FontAwesomeIcon icon="plus" className="mr-2" />
-              CREATE GAME
+              CREATE ROOM
             </SBButton>
           </Col>
         </Row>
@@ -86,7 +86,7 @@ const Home: React.FC = () => {
           {!games.length && (
             <Col>
               <div className={styles.noGames}>
-                No games found. Create a game!
+                No rooms found. Create one now!
               </div>
             </Col>
           )}

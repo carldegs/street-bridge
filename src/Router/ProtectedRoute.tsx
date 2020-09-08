@@ -4,6 +4,7 @@ import React, { useEffect, ReactNode } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import startCase from 'lodash/startCase';
 import camelCase from 'lodash/camelCase';
+import { Spinner } from 'react-bootstrap';
 
 import SBNavbar from '../components/SBNavbar/SBNavbar';
 import { Game, Phase } from '../models';
@@ -47,7 +48,24 @@ const ProtectedRoute: React.FC<IProtectedRoute> = ({
 }: IProtectedRoute) => {
   if (!isPublic) {
     if (isAuthenticating) {
-      return <div>Loading...</div>;
+      return (
+        <div
+          style={{
+            width: '100%',
+            height: '100vh',
+            position: 'absolute',
+            background: '#1b1924',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Spinner animation="border" role="status">
+            <span className="sr-only">Loading...</span>
+          </Spinner>
+        </div>
+      );
     }
 
     if (!authUser || !Component) {
