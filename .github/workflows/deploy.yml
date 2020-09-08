@@ -18,10 +18,10 @@ jobs:
         uses: actions/checkout@master
 
       - name: Install Dependencies
-        uses: yarn install
+        uses: npm install
       
       - name: Check for lint errors
-        run: yarn lint
+        run: npm lint
       
       - name: Build
         env:
@@ -34,7 +34,7 @@ jobs:
           REACT_APP_APP_ID: ${{ secrets.REACT_APP_APP_ID }}
           REACT_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
           REACT_APP_VERSION: v0.1.5
-        uses: yarn build
+        uses: npm run build
   
   deploy:
     name: Deploy using Firebase Hosting
