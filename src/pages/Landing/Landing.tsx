@@ -28,7 +28,7 @@ const schema = {
 
 const Landing: React.FC = () => {
   const firebase = useFirebase();
-  const [error, setError] = useState('');
+  const [error, setError] = useState<any>(undefined);
   const dispatch = useDispatch();
 
   const submitCallback = useCallback(
@@ -37,11 +37,12 @@ const Landing: React.FC = () => {
         return;
       }
 
+      setError(undefined);
       const { email, password } = params.values;
       firebase
         .loginUser(email, password)
         .then(resp => dispatch([ActionType.setAuthUser, resp.user]))
-        .catch(err => setError(err.message));
+        .catch(err => setError(err));
     },
     [firebase, dispatch]
   );
@@ -80,7 +81,21 @@ const Landing: React.FC = () => {
                 onBlur={handleBlur}
                 type="password"
               />
-              {!!error && <Alert variant="danger">{error}</Alert>}
+              {!!error?.message && (
+                <Alert variant="danger">
+                  {`${error.message} `}
+                  {error.code === 'auth/wrong-password' && (
+                    <span
+                      style={{ textDecoration: 'underline', cursor: 'pointer' }}
+                      onClick={() => {
+                        firebase.sendResetPasswordMail(values.email);
+                      }}
+                    >
+                      Reset Password
+                    </span>
+                  )}
+                </Alert>
+              )}
               <div className="pt-4 float-right">
                 <Link to="/signup">
                   <SBButton outline className="mr-3">
@@ -107,7 +122,7 @@ const Landing: React.FC = () => {
         }}
         title="Open GitHub repo"
       >
-        {process.env.REACT_APP_VERSION}
+        v0.2.0
         <FontAwesomeIcon icon="code-branch" className="ml-3" />
       </div>
     </Container>

@@ -31,7 +31,7 @@ const schema = {
 const Signup: React.FC = () => {
   const firebase = useFirebase();
   const history = useHistory();
-  const [error] = useState('');
+  const [error, setError] = useState('');
 
   const submitCallback = useCallback(
     async (params: Partial<IState<typeof initialValues>>) => {
@@ -40,9 +40,12 @@ const Signup: React.FC = () => {
       }
 
       const { email, password, displayName } = params.values;
-      await firebase.signupUser(email, password, displayName);
-
-      history.push('/');
+      await firebase
+        .signupUser(email, password, displayName)
+        .then(() => {
+          history.push('/verify', { email });
+        })
+        .catch(err => setError(err.message));
     },
     [firebase, history]
   );
@@ -93,7 +96,7 @@ const Signup: React.FC = () => {
           {error && <Alert variant="danger">{error}</Alert>}
           <div className="pt-4 float-right">
             <Link to="/" className="mr-3">
-              <SBButton outline onClick={(e: any) => handleSubmit(e as Event)}>
+              <SBButton outline onClick={() => history.push('/')}>
                 LOGIN
               </SBButton>
             </Link>

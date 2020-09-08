@@ -6,6 +6,7 @@ import Signup from './Signup/Signup';
 import GameLobby from './GameLobby/GameLobby';
 import GameBid from './GameBid/GameBid';
 import GamePlay from './GamePlay/GamePlay';
+import Verification from './Verification/Verification';
 
 const ROOT_ROUTES: RouteObject[] = [
   {
@@ -49,6 +50,13 @@ const ROOT_ROUTES: RouteObject[] = [
     path: '/game/post/:id',
     name: 'Results',
     component: GamePlay,
+  },
+  {
+    path: '/verify',
+    name: 'Verification',
+    component: Verification,
+    isPublic: true,
+    hideNavbar: true,
   },
 ];
 

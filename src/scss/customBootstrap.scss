@@ -37,6 +37,15 @@ body {
   border-radius: 0 !important;
 }
 
+.modal-header {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.modal-body {
+  font-size: 16px;
+}
+
 label {
   color: $dark2;
   opacity: 0.8;
