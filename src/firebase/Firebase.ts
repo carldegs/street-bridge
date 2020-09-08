@@ -50,7 +50,9 @@ class Firebase {
 
   // Auth API
   // TODO: Move
+  // eslint-disable-next-line consistent-return
   signupUser = async (email: string, password: string, username: string) => {
+    // eslint-disable-next-line no-useless-catch
     try {
       const user = await this.auth.createUserWithEmailAndPassword(
         email,
@@ -58,32 +60,75 @@ class Firebase {
       );
 
       if (user.user) {
-        const res = await user.user.updateProfile({
-          displayName: username,
-        });
+        // eslint-disable-next-line no-useless-catch
+        try {
+          await user.user.updateProfile({
+            displayName: username,
+          });
 
-        return res;
+          const res = await user.user.sendEmailVerification({
+            url: window.location.origin || 'http://localhost:3000',
+          });
+          return res;
+        } catch (err) {
+          throw err;
+        }
       }
-
-      return null;
     } catch (err) {
-      return err;
+      throw err;
     }
   };
 
-  loginUser = (
+  loginUser = async (
     email: string,
     password: string
-  ): Promise<app.auth.UserCredential> =>
-    this.auth.signInWithEmailAndPassword(email, password);
+  ): Promise<app.auth.UserCredential> => {
+    // eslint-disable-next-line no-useless-catch
+    try {
+      const res = await this.auth.signInWithEmailAndPassword(email, password);
+
+      if (res.user?.emailVerified) {
+        return res;
+      }
+
+      if (res.user?.sendEmailVerification) {
+        res.user.sendEmailVerification({
+          url: window.location.origin || 'http://localhost:3000',
+        });
+      }
+      this.auth.signOut();
+      throw new Error(
+        'Your account is not yet verified. Check your email to finish the verification process.'
+      );
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  sendResetPasswordMail = (email: string) =>
+    this.auth.sendPasswordResetEmail(email, { url: window.location.origin });
+
+  deleteUser = () => this.auth.currentUser && this.auth.currentUser.delete();
 
   logoutUser = (): Promise<void> => this.auth.signOut();
 
   resetPassword = (email: string): Promise<void> =>
     this.auth.sendPasswordResetEmail(email);
 
-  updatePassword = (password: string): Promise<void> | undefined =>
-    this.auth.currentUser?.updatePassword(password);
+  updatePassword = async (
+    email: string,
+    password: string,
+    newPassword: string
+  ) => {
+    // eslint-disable-next-line no-useless-catch
+    try {
+      await this.auth.signInWithEmailAndPassword(email, password);
+      const res = await this.auth.currentUser?.updatePassword(newPassword);
+      return res;
+    } catch (err) {
+      throw err;
+    }
+  };
 
   // GAMES
   getGame = async (gameId: string) => {

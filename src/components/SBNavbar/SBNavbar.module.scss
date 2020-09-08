@@ -35,18 +35,12 @@
     justify-content: center;
   }
 
-  .logout {
+  .userButton {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     justify-content: center;
     cursor: pointer;
-
-    &:hover {
-      .logoutButton {
-        color: $red;
-      }
-    }
 
     .username {
       font-size: 18px;
@@ -54,10 +48,21 @@
       margin-bottom: -4px;
     }
 
-    .logoutButton {
+    .settingsButton {
       color: $dark0;
       font-weight: bold;
       font-size: 12px;
+      height: 0;
+      opacity: 0;
+      transition: all 0.25s;
+    }
+
+    &:hover {
+      .settingsButton {
+        color: $cyan;
+        height: 18px;
+        opacity: 1;
+      }
     }
   }
 }
