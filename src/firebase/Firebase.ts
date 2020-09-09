@@ -23,6 +23,8 @@ const config = {
 class Firebase {
   public auth: app.auth.Auth;
 
+  public googleProvider: app.auth.GoogleAuthProvider;
+
   public db: app.firestore.Firestore;
 
   public games: app.firestore.CollectionReference<app.firestore.DocumentData>;
@@ -38,6 +40,8 @@ class Firebase {
       this.auth = app.auth();
       this.db = app.firestore();
 
+      this.googleProvider = new app.auth.GoogleAuthProvider();
+
       this.games = this.db.collection('games');
     } else {
       this.auth = {} as app.auth.Auth;
@@ -45,6 +49,7 @@ class Firebase {
       this.games = {} as app.firestore.CollectionReference<
         app.firestore.DocumentData
       >;
+      this.googleProvider = {} as app.auth.GoogleAuthProvider;
     }
   }
 
@@ -105,10 +110,73 @@ class Firebase {
     }
   };
 
+  loginUserWithGoogle = async () => {
+    // eslint-disable-next-line no-useless-catch
+    try {
+      const res = await this.auth.signInWithPopup(this.googleProvider);
+      return res;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  getUserSignInMethod = (): string[] => {
+    let signInMethods: string[] = [];
+    if (this.auth.currentUser?.providerData) {
+      signInMethods = this.auth.currentUser.providerData.map(data =>
+        data?.providerId ? data.providerId : 'unknown'
+      );
+    }
+
+    return signInMethods;
+  };
+
+  isGoogleUserFirstLogin = () => {
+    const { providerData, displayName } = this.auth.currentUser || {};
+    if (providerData && displayName) {
+      let isFirstLogin = false;
+      providerData.forEach(data => {
+        if (
+          data?.providerId === 'google.com' &&
+          displayName === data.displayName
+        ) {
+          isFirstLogin = true;
+        }
+      });
+
+      return isFirstLogin;
+    }
+
+    return false;
+  };
+
+  updateUser = (data: { displayName?: string; photoURL?: string }) => {
+    if (this.auth.currentUser && Object.keys(data).length) {
+      this.auth.currentUser.updateProfile(data);
+    }
+  };
+
   sendResetPasswordMail = (email: string) =>
     this.auth.sendPasswordResetEmail(email, { url: window.location.origin });
 
-  deleteUser = () => this.auth.currentUser && this.auth.currentUser.delete();
+  deleteUser = async (email: string, password?: string) => {
+    const signInMethods = this.getUserSignInMethod();
+
+    // eslint-disable-next-line no-useless-catch
+    try {
+      if (signInMethods.includes('password') && !!password) {
+        await this.auth.signInWithEmailAndPassword(email, password);
+      } else if (signInMethods.includes('google.com')) {
+        await this.auth.signInWithPopup(this.googleProvider);
+      }
+    } catch (err) {
+      throw err;
+    }
+
+    if (this.auth.currentUser) {
+      await this.auth.currentUser.delete();
+    }
+  };
 
   logoutUser = (): Promise<void> => this.auth.signOut();
 
