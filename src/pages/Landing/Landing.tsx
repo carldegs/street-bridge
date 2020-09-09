@@ -81,8 +81,48 @@ const Landing: React.FC = () => {
                 onBlur={handleBlur}
                 type="password"
               />
+              <div className="mt-4 mb-3" style={{ height: '27px' }}>
+                <Row>
+                  <Col />
+                  <Col>
+                    <Link to="/signup">
+                      <SBButton outline className="mr-3">
+                        SIGNUP
+                      </SBButton>
+                    </Link>
+                    <SBButton onClick={handleSubmit} disabled={hasErrors}>
+                      LOGIN
+                    </SBButton>
+                  </Col>
+                </Row>
+              </div>
+              <div
+                style={{
+                  borderTop: '1px solid #000000',
+                  marginLeft: '-16px',
+                  width: 'calc(100% + 32px)',
+                  opacity: '0.3',
+                }}
+                className="my-4"
+              />
+              <div>
+                <SBButton
+                  outline
+                  className="d-flex w-100"
+                  onClick={() => firebase.loginUserWithGoogle()}
+                >
+                  <img
+                    src="https://cdn.worldvectorlogo.com/logos/google-icon.svg"
+                    height="20"
+                    alt="google-logo"
+                    className="mr-3"
+                  />
+                  SIGN IN WITH GOOGLE
+                </SBButton>
+              </div>
+
               {!!error?.message && (
-                <Alert variant="danger">
+                <Alert variant="danger" className="mt-4 mb-0">
                   {`${error.message} `}
                   {error.code === 'auth/wrong-password' && (
                     <span
@@ -96,16 +136,6 @@ const Landing: React.FC = () => {
                   )}
                 </Alert>
               )}
-              <div className="pt-4 float-right">
-                <Link to="/signup">
-                  <SBButton outline className="mr-3">
-                    SIGNUP
-                  </SBButton>
-                </Link>
-                <SBButton onClick={handleSubmit} disabled={hasErrors}>
-                  LOGIN
-                </SBButton>
-              </div>
             </Form>
           </div>
         </Col>
@@ -122,7 +152,7 @@ const Landing: React.FC = () => {
         }}
         title="Open GitHub repo"
       >
-        v0.2.0
+        v0.2.1
         <FontAwesomeIcon icon="code-branch" className="ml-3" />
       </div>
     </Container>

@@ -26,18 +26,42 @@ const SBNavbar: React.FC<ISBNavbar> = ({ children, title }: ISBNavbar) => {
   const [allowResetPassword, setAllowResetPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
 
+  const isPasswordSignin = firebase.getUserSignInMethod().includes('password');
+
   // TODO: Convert to reusable components
   return (
     <div>
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
         <Modal.Header closeButton>Delete Account</Modal.Header>
-        <Modal.Body>Sure ka na ba???</Modal.Body>
+        <Modal.Body>
+          <div>Sure ka na ba???</div>
+          {isPasswordSignin && (
+            <Form.Group controlId="password">
+              <Form.Label style={{ color: '#E9EBF9' }}>Password</Form.Label>
+              <Form.Control
+                value={password}
+                onChange={e => {
+                  setPassword(e.target.value);
+                }}
+                type="password"
+              />
+              {passwordError && <Alert variant="danger">{passwordError}</Alert>}
+            </Form.Group>
+          )}
+        </Modal.Body>
+
         <Modal.Footer>
           <SBButton
             className="mr-4"
+            disabled={isPasswordSignin && !password}
             onClick={async () => {
-              await firebase.deleteUser();
-              firebase.logoutUser();
+              if (auth.state.authUser?.email) {
+                await firebase.deleteUser(auth.state.authUser.email, password);
+                // TODO: Show modal to confirm user is deleted
+                // and show button to redirect to the landing page
+                firebase.logoutUser();
+                auth.logout();
+              }
             }}
           >
             YES
@@ -122,17 +146,19 @@ const SBNavbar: React.FC<ISBNavbar> = ({ children, title }: ISBNavbar) => {
           >
             SETTINGS
           </span>
-          <SBButton
-            outline
-            color="cyan"
-            className="mt-3"
-            onClick={() => {
-              setShowResetPWModal(true);
-              setShowSettingsModal(false);
-            }}
-          >
-            RESET PASSWORD
-          </SBButton>
+          {isPasswordSignin && (
+            <SBButton
+              outline
+              color="cyan"
+              className="mt-3"
+              onClick={() => {
+                setShowResetPWModal(true);
+                setShowSettingsModal(false);
+              }}
+            >
+              RESET PASSWORD
+            </SBButton>
+          )}
           <SBButton
             outline
             color="red"

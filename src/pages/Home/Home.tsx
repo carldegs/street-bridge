@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Row, Col, Modal, Form } from 'react-bootstrap';
 import cx from 'classnames';
 import { useHistory } from 'react-router-dom';
-import { sample } from 'lodash';
+import { sample, camelCase } from 'lodash';
 
 import { useFirebase } from '../../firebase/useFirebase';
 import { useGames } from '../../firebase/hooks';
@@ -21,11 +21,61 @@ const Home: React.FC = () => {
   const [showNameModal, setShowNameModal] = useState(false);
   const [gameName, setGameName] = useState('');
   const [allowCreateGame, setAllowCreateGame] = useState(false);
+  const [newUsername, setNewUsername] = useState(
+    camelCase(auth.state.authUser?.displayName || '').replace('.', '')
+  );
+  const [allowSetup, setAllowSetup] = useState(
+    !!newUsername && username !== newUsername && !newUsername.includes('.')
+  );
 
   const games = useGames();
 
   return (
     <div className={styles.Home} data-testid="Home">
+      <Modal show={firebase.isGoogleUserFirstLogin()} backdrop="static">
+        <Modal.Header>{`Hi ${auth.state.authUser?.displayName}!`}</Modal.Header>
+        <Modal.Body>
+          <div className="font-weight-bold mb-4">Setup your account</div>
+          <Form.Group controlId="newUsername">
+            <Form.Label className={styles.gameNameModalLabel}>
+              Username
+            </Form.Label>
+            <Form.Control
+              value={newUsername}
+              onChange={e => {
+                setNewUsername(e.target.value);
+                setAllowSetup(
+                  !!e.target.value &&
+                    username !== e.target.value &&
+                    !e.target.value.includes('.')
+                );
+              }}
+              onBlur={() => {
+                setAllowSetup(
+                  !!newUsername &&
+                    username !== newUsername &&
+                    !newUsername.includes('.')
+                );
+              }}
+              style={{ color: 'white' }}
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <SBButton
+            color="green"
+            disabled={!allowSetup}
+            onClick={async () => {
+              await firebase.updateUser({
+                displayName: newUsername,
+              });
+              history.go(0);
+            }}
+          >
+            SUBMIT
+          </SBButton>
+        </Modal.Footer>
+      </Modal>
       <Modal
         show={showNameModal}
         onHide={() => {
