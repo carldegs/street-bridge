@@ -12,7 +12,7 @@ import Cards from '../../components/Cards/Cards';
 import { Card, BidSuit, Phase } from '../../models';
 import CardComponent from '../../components/CardComponent/CardComponent';
 import SBButton from '../../components/SBButton/SBButton';
-import { getSuitString } from '../../utils/cards';
+import { getSuitString, getCardColor } from '../../utils/cards';
 import RoundsSummary from '../../components/RoundsSummary/RoundsSummary';
 
 import styles from './GamePlay.module.scss';
@@ -224,7 +224,7 @@ const GamePlay: React.FC = () => {
           <div
             className={cx(
               styles.bidInfo,
-              styles[`text${playersTable.bidColor}`]
+              styles[`text${getCardColor(playersTable?.currBid?.suit)}`]
             )}
           >
             {playersTable?.currBid?.value ? (
@@ -240,6 +240,18 @@ const GamePlay: React.FC = () => {
               'N/A'
             )}
           </div>
+          {playersTable?.currBid?.value && (
+            <div
+              className={cx(
+                styles.subtitle,
+                styles[`text${playersTable.bidColor}`],
+                'ml-3'
+              )}
+              style={{ opacity: 0.4, marginTop: '-4px' }}
+            >
+              {`(${playersTable.bidColor} Team)`}
+            </div>
+          )}
         </Col>
         <Col className={styles.smallInfo}>
           <div className={styles.redScore}>
@@ -268,7 +280,7 @@ const GamePlay: React.FC = () => {
           <div
             className={cx(
               styles.bidInfo,
-              styles[`text${playersTable.bidColor}`]
+              styles[`text${getCardColor(playersTable?.currBid?.suit)}`]
             )}
           >
             {playersTable?.currBid?.value ? (
@@ -285,6 +297,17 @@ const GamePlay: React.FC = () => {
             )}
           </div>
           <div className={styles.subtitle}>Current Bid</div>
+          {playersTable?.currBid?.value && (
+            <div
+              className={cx(
+                styles.subtitle,
+                styles[`text${playersTable.bidColor}`]
+              )}
+              style={{ opacity: 0.4, marginTop: '-4px' }}
+            >
+              {`(${playersTable.bidColor} Team)`}
+            </div>
+          )}
         </Col>
         <Col>
           <div className={styles.row1}>

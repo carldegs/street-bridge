@@ -1,9 +1,9 @@
 import React from 'react';
 import cx from 'classnames';
 
-import { Card, CardSuit } from '../../models';
+import { Card } from '../../models';
 
-import { getCardValue, getSuitString } from '../../utils/cards';
+import { getCardValue, getSuitString, getCardColor } from '../../utils/cards';
 
 import styles from './Card.module.scss';
 
@@ -15,20 +15,6 @@ interface ICard {
   className?: string;
   small?: boolean;
 }
-
-const getCardColor = (suit: CardSuit) => {
-  switch (suit) {
-    case CardSuit.club:
-      return 'Purple';
-    case CardSuit.spade:
-      return 'Blue';
-    case CardSuit.diamond:
-      return 'Yellow';
-    case CardSuit.heart:
-    default:
-      return 'Red';
-  }
-};
 
 const CardComponent: React.FC<ICard> = ({
   card,

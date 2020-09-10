@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import cx from 'classnames';
 
 import { Row, Col } from 'react-bootstrap';
@@ -49,7 +49,16 @@ const Cards: React.FC<ICards> = ({
   roundSuit = BidSuit.noTrump,
   isFirstPlayer = false,
 }: ICards) => {
+  const [tempDisable, setTempDisable] = useState(false);
+  const ref = useRef((0 as unknown) as ReturnType<typeof setTimeout>);
   const finalCards = cards.filter(card => card.turnUsed === -1);
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(ref.current);
+    };
+  }, []);
+
   return (
     <Row style={{ width: '100%', margin: 0, justifyContent: 'center' }}>
       <Col
@@ -71,10 +80,15 @@ const Cards: React.FC<ICards> = ({
               key={`${card.value}${card.suit}`}
               card={card}
               style={{ zIndex: i }}
-              disabled={isDisabled}
+              disabled={isDisabled || tempDisable}
               onClick={() => {
-                if (!isDisabled && !!onClick) {
+                if (!isDisabled && !!onClick && !tempDisable) {
                   onClick(card);
+
+                  setTempDisable(true);
+                  ref.current = setTimeout(() => {
+                    setTempDisable(false);
+                  }, 2000);
                 }
               }}
               className={styles.card}

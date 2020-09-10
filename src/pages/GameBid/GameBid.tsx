@@ -8,7 +8,7 @@ import { range, sortBy } from 'lodash';
 
 import { useGame } from '../../firebase/hooks';
 import { useFirebase } from '../../firebase/useFirebase';
-import { getSuitString } from '../../utils/cards';
+import { getSuitString, getCardColor } from '../../utils/cards';
 import { BidSuit, Card, Phase } from '../../models';
 import SBButton from '../../components/SBButton/SBButton';
 import { toBidsArray, getScoreToWin } from '../../utils/bids';
@@ -251,7 +251,7 @@ const GameBid: React.FC = () => {
           <div
             className={cx(
               styles.bidInfo,
-              styles[`text${getColor(currBidTeam || 0)}`]
+              styles[`text${getCardColor(currBid?.suit)}`]
             )}
           >
             {currBid?.value ? (
@@ -266,6 +266,17 @@ const GameBid: React.FC = () => {
             )}
           </div>
           <div className={styles.subtitle}>Current Bid</div>
+          {currBid?.value && (
+            <div
+              className={cx(
+                styles.subtitle,
+                styles[`text${getColor(currBidTeam || 0)}`]
+              )}
+              style={{ opacity: 0.4, marginTop: '-4px' }}
+            >
+              {`(${currBidTeam === 0 ? 'Red' : 'Blue'} Team)`}
+            </div>
+          )}
         </Col>
         <Col className="d-flex flex-column align-items-center justify-content-center">
           <div className={styles.bidChat}>
@@ -347,6 +358,7 @@ const GameBid: React.FC = () => {
                   <SBButton
                     outline
                     color="red"
+                    tempDisableOnClick={1500}
                     onClick={() => {
                       if (authUser.displayName) {
                         firebase.setBid(id, authUser.displayName, {
@@ -361,6 +373,7 @@ const GameBid: React.FC = () => {
                   <SBButton
                     outline
                     color="green"
+                    tempDisableOnClick={1500}
                     onClick={() => {
                       if (
                         authUser.displayName &&

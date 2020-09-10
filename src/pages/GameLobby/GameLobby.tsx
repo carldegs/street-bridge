@@ -17,7 +17,7 @@ const GameLobby: React.FC = () => {
   const firebase = useFirebase();
   const { id } = useParams();
   const { game, error: gameError } = useGame(id);
-  const { players } = game;
+  const { players, host } = game;
 
   const auth = useAuth();
   const authUser = auth.state.authUser || { displayName: '' };
@@ -102,7 +102,7 @@ const GameLobby: React.FC = () => {
               LEAVE GAME
             </SBButton>
           )}
-          {players[0] === authUser.displayName && (
+          {host === authUser.displayName && (
             <SBButton
               outline
               color="cyan"
@@ -115,7 +115,7 @@ const GameLobby: React.FC = () => {
               DELETE GAME
             </SBButton>
           )}
-          {players[0] === authUser.displayName && (
+          {host === authUser.displayName && (
             <SBButton
               color="green"
               outline
@@ -137,7 +137,7 @@ const GameLobby: React.FC = () => {
             <div className={styles.players}>
               {teamAPlayers.map(username => (
                 <p key={username}>
-                  {username === players[0] && (
+                  {username === host && (
                     <Badge className="mx-2" variant="secondary" pill>
                       Host
                     </Badge>
@@ -176,7 +176,7 @@ const GameLobby: React.FC = () => {
               {teamBPlayers.map(username => (
                 <p key={username}>
                   {username}
-                  {username === players[0] && (
+                  {username === host && (
                     <Badge variant="secondary" className="mx-2">
                       Host
                     </Badge>

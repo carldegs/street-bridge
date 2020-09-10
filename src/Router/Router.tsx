@@ -21,7 +21,10 @@ const Router: React.FC = () => {
     const obs = firebase.auth.onAuthStateChanged(async user => {
       try {
         setIsAuthenticating(true);
-        if (user && user.emailVerified) {
+        if (
+          user &&
+          (process.env.NODE_ENV === 'development' ? true : user.emailVerified)
+        ) {
           setAuthUser(user);
           // TODO: Check if cause of too many reads
           const res = await firebase.db
