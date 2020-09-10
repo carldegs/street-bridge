@@ -80,3 +80,21 @@ export const getSuitString = (
       return undefined;
   }
 };
+
+export const getCardColor = (suit?: CardSuit | BidSuit): string => {
+  switch (suit) {
+    case CardSuit.club:
+    case BidSuit.club:
+      return 'Purple';
+    case CardSuit.spade:
+    case BidSuit.spade:
+      return 'Blue';
+    case CardSuit.diamond:
+    case BidSuit.diamond:
+      return 'Yellow';
+    case CardSuit.heart:
+    case BidSuit.heart:
+    default:
+      return 'Red';
+  }
+};

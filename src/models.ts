@@ -65,4 +65,5 @@ export interface Game {
   id?: string;
   currRound: number;
   rounds: Record<number, Round>;
+  host: string;
 }

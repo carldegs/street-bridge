@@ -52,11 +52,13 @@
     position: absolute;
     bottom: 12px;
     right: 12px;
-    color: $dark0;
+    color: $light;
+    opacity: 0.5;
     cursor: pointer;
+    transition: opacity ease-out 0.25s;
 
     &:hover {
-      color: $light;
+      opacity: 1;
     }
   }
 }

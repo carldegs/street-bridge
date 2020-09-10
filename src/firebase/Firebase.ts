@@ -92,7 +92,7 @@ class Firebase {
     try {
       const res = await this.auth.signInWithEmailAndPassword(email, password);
 
-      if (res.user?.emailVerified) {
+      if (res.user?.emailVerified || process.env.NODE_ENV === 'development') {
         return res;
       }
 
@@ -234,6 +234,7 @@ class Firebase {
         bids: [],
         currRound: 0,
         rounds: [],
+        host: username,
       };
       const res = await this.games.add({ ...game });
       return res.id;
@@ -244,19 +245,32 @@ class Firebase {
 
   joinGame = async (gameId: string, username: string, team: number) => {
     try {
-      const userUpdate = `playerInfo.${username}`;
-      const res = await this.games.doc(gameId).update({
-        players: app.firestore.FieldValue.arrayUnion(username),
-        [userUpdate]: {
-          username,
-          team,
-          bid: {
-            suit: BidSuit.none,
-            value: 1,
-          },
-          cards: [],
-          isHost: false,
-        },
+      const res = await this.db.runTransaction(async transaction => {
+        const userUpdate = `playerInfo.${username}`;
+        const gameRef = this.games.doc(gameId);
+
+        return transaction.get(gameRef).then(async getGame => {
+          if (!getGame.exists) {
+            throw new Error('Game does not exist!');
+          }
+
+          const data = getGame.data() as Game;
+
+          transaction.update(gameRef, {
+            players: app.firestore.FieldValue.arrayUnion(username),
+            [userUpdate]: {
+              username,
+              team,
+              bid: {
+                suit: BidSuit.none,
+                value: 1,
+              },
+              cards: [],
+              isHost: !data.host,
+            },
+            ...(!data.host ? { host: username } : {}),
+          });
+        });
       });
       return res;
     } catch (err) {
@@ -265,11 +279,35 @@ class Firebase {
   };
 
   leaveGame = async (gameId: string, username: string) => {
-    // TODO: Set new host if host left the game.
     try {
-      const res = await this.games.doc(gameId).update({
-        players: app.firestore.FieldValue.arrayRemove(username),
-        [`playerInfo.${username}`]: app.firestore.FieldValue.delete(),
+      const res = await this.db.runTransaction(async transaction => {
+        const gameRef = this.games.doc(gameId);
+
+        return transaction.get(gameRef).then(async getGame => {
+          if (!getGame.exists) {
+            throw new Error('Game does not exist!');
+          }
+
+          const data = getGame.data() as Game;
+          const remainingPlayers = data.players.filter(
+            player => player !== username
+          );
+
+          transaction.update(gameRef, {
+            players: app.firestore.FieldValue.arrayRemove(username),
+            [`playerInfo.${username}`]: app.firestore.FieldValue.delete(),
+            ...(data.host === username
+              ? {
+                  host: remainingPlayers.length ? remainingPlayers[0] : '',
+                }
+              : {}),
+            ...(data.host === username && remainingPlayers.length
+              ? {
+                  [`playerInfo.${remainingPlayers[0]}.isHost`]: true,
+                }
+              : {}),
+          });
+        });
       });
 
       return res;
@@ -315,9 +353,6 @@ class Firebase {
         ...cards,
         phase: Phase.bid,
         players: newPlayers.map(player => player.username),
-        ...(!newPlayers.some(player => player.isHost) && {
-          [`playerInfo.${players[0]}.isHost`]: true,
-        }),
       } as Partial<Game>);
 
       return res;
@@ -388,6 +423,14 @@ class Firebase {
   };
 
   playCard = async (gameId: string, username: string, card: Card) => {
+    // TODO: Remove once issue is fixed
+    // eslint-disable-next-line no-console
+    console.log('DEV TEST', gameId, username, card);
+
+    if (!card) {
+      return;
+    }
+
     try {
       const res = await this.db.runTransaction(async transaction => {
         const gameRef = this.games.doc(gameId);

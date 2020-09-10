@@ -12,4 +12,4 @@ export const toBidsArray = (bids?: Record<number, PlayerBid>): PlayerBid[] => {
 };
 
 export const getScoreToWin = (isCurrTeam: boolean, bidValue: number): number =>
-  isCurrTeam ? 6 + bidValue : 7 - bidValue;
+  isCurrTeam ? 6 + bidValue : 8 - bidValue;

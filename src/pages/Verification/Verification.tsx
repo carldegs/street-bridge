@@ -17,7 +17,7 @@ const Verification: React.FC = () => {
       <h1>One more step!</h1>
       <h4 className="mb-4">
         We have sent an email to
-        <b>{email}</b>
+        <b>{` ${email}`}</b>
       </h4>
 
       <p style={{ maxWidth: '520px' }} className="mb-5">
