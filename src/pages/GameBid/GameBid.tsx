@@ -96,14 +96,6 @@ const GameBid: React.FC = () => {
     );
   }, [game, authUser]);
 
-  const isAuthUserAHost = useMemo(() => {
-    return !!(
-      game?.playerInfo &&
-      authUser?.displayName &&
-      game?.playerInfo[authUser.displayName]?.isHost
-    );
-  }, [game, authUser]);
-
   useEffect(() => {
     if (bidValue === null || !validBids.some(bid => bid === bidValue)) {
       setBidValue(validBids[0]);
@@ -195,7 +187,7 @@ const GameBid: React.FC = () => {
               BACK TO LOBBY
             </SBButton>
           )}
-          {isAuthUserAHost && (
+          {authUser?.displayName === game?.host && (
             <SBButton
               outline
               color="red"

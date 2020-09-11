@@ -82,6 +82,7 @@ const useGameDetails = (id: string): IGameDetail => {
       winBid,
       winPlayer,
       score,
+      host,
     } = game || {};
     const { displayName } = authUser;
 
@@ -151,11 +152,7 @@ const useGameDetails = (id: string): IGameDetail => {
         }
       }
 
-      const isHost = !!(
-        playerInfo &&
-        displayName &&
-        playerInfo[displayName]?.isHost
-      );
+      const isHost = displayName === host;
 
       setGameDetails({
         left: {

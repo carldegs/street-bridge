@@ -222,7 +222,6 @@ class Firebase {
               value: 1,
             },
             cards: [],
-            isHost: true,
           },
         },
         phase: Phase.lobby,
@@ -266,7 +265,6 @@ class Firebase {
                 value: 1,
               },
               cards: [],
-              isHost: !data.host,
             },
             ...(!data.host ? { host: username } : {}),
           });
@@ -299,11 +297,6 @@ class Firebase {
             ...(data.host === username
               ? {
                   host: remainingPlayers.length ? remainingPlayers[0] : '',
-                }
-              : {}),
-            ...(data.host === username && remainingPlayers.length
-              ? {
-                  [`playerInfo.${remainingPlayers[0]}.isHost`]: true,
                 }
               : {}),
           });
