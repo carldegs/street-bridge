@@ -9,21 +9,22 @@ import { range, sortBy } from 'lodash';
 import { useGame } from '../../firebase/hooks';
 import { useFirebase } from '../../firebase/useFirebase';
 import { getSuitString, getCardColor } from '../../utils/cards';
-import { BidSuit, Card, Phase } from '../../models';
+import { BidSuit, Card, DefaultParams, Phase } from '../../models';
 import SBButton from '../../components/SBButton/SBButton';
 import { toBidsArray, getScoreToWin } from '../../utils/bids';
 import Cards from '../../components/Cards/Cards';
 import { useAuth } from '../../store/useAuth';
 
-import styles from './GameBid.module.scss';
 import PlayerListModal from '../../components/PlayerListModal/PlayerListModal';
+
+import styles from './GameBid.module.scss';
 
 const getColor = (team: number): 'Red' | 'Blue' =>
   team === 0 ? 'Red' : 'Blue';
 
 const GameBid: React.FC = () => {
   const history = useHistory();
-  const { id } = useParams();
+  const { id } = useParams<DefaultParams>();
   const { game, error: gameError } = useGame(id);
   const firebase = useFirebase();
   const auth = useAuth();

@@ -152,7 +152,7 @@ const Landing: React.FC = () => {
         }}
         title="Open GitHub repo"
       >
-        v0.2.3
+        v0.2.4
         <FontAwesomeIcon icon="code-branch" className="ml-3" />
       </div>
     </Container>
