@@ -234,6 +234,7 @@ class Firebase {
         currRound: 0,
         rounds: [],
         host: username,
+        spectators: [],
       };
       const res = await this.games.add({ ...game });
       return res.id;
@@ -257,6 +258,7 @@ class Firebase {
 
           transaction.update(gameRef, {
             players: app.firestore.FieldValue.arrayUnion(username),
+            spectators: app.firestore.FieldValue.arrayRemove(username),
             [userUpdate]: {
               username,
               team,
@@ -276,6 +278,55 @@ class Firebase {
     }
   };
 
+  spectateGame = async (gameId: string, username: string) => {
+    const res = await this.db.runTransaction(async transaction => {
+      const gameRef = this.games.doc(gameId);
+
+      return transaction.get(gameRef).then(async getGame => {
+        if (!getGame.exists) {
+          throw new Error('Game does not exist');
+        }
+
+        const data = getGame.data() as Game;
+
+        let updateData = {};
+
+        if (!data.spectators.some(s => s === username)) {
+          updateData = {
+            ...updateData,
+            spectators: app.firestore.FieldValue.arrayUnion(username),
+          };
+        }
+
+        if (data.players.some(s => s === username)) {
+          updateData = {
+            ...updateData,
+            players: app.firestore.FieldValue.arrayRemove(username),
+          };
+        }
+
+        if (data.playerInfo[username]?.username) {
+          updateData = {
+            ...updateData,
+            [`playerInfo.${username}`]: app.firestore.FieldValue.delete(),
+          };
+        }
+
+        transaction.update(gameRef, updateData);
+      });
+    });
+
+    return res;
+  };
+
+  changeHost = async (gameId: string, host: string) => {
+    const res = await this.games.doc(gameId).update({
+      host,
+    });
+
+    return res;
+  };
+
   leaveGame = async (gameId: string, username: string) => {
     try {
       const res = await this.db.runTransaction(async transaction => {
@@ -293,6 +344,7 @@ class Firebase {
 
           transaction.update(gameRef, {
             players: app.firestore.FieldValue.arrayRemove(username),
+            spectators: app.firestore.FieldValue.arrayRemove(username),
             [`playerInfo.${username}`]: app.firestore.FieldValue.delete(),
             ...(data.host === username
               ? {

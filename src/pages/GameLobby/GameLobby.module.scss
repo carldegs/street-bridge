@@ -40,7 +40,8 @@
     justify-content: center;
 
     .teamA,
-    .teamB {
+    .teamB,
+    .spectators {
       display: flex;
       flex-direction: column;
       padding: 48px;
@@ -59,6 +60,14 @@
       flex-direction: column-reverse;
       background-color: $blue;
       margin-top: 186px;
+    }
+
+    .spectators {
+      border-radius: 48px;
+      background-color: $purple;
+      padding: 24px;
+      width: 100%;
+      text-align: center;
     }
 
     .teamTitle {

@@ -35,6 +35,16 @@ const Router: React.FC = () => {
           if (res?.docs?.length) {
             const game = res.docs[0].data();
             setAuthUserGame({ ...game, id: res.docs[0].id } as Game);
+          } else {
+            const res2 = await firebase.db
+              .collection('games')
+              .where('spectators', 'array-contains', user.displayName)
+              .get();
+
+            if (res2?.docs?.length) {
+              const game = res2.docs[0].data();
+              setAuthUserGame({ ...game, id: res2.docs[0].id } as Game);
+            }
           }
         }
       } catch (err) {

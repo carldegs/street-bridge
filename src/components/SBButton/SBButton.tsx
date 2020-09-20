@@ -19,6 +19,7 @@ interface ISBButton {
   onClick?: (e: Event) => void;
   disabled?: boolean;
   tempDisableOnClick?: number;
+  style?: Record<any, any>;
 }
 
 const SBButton: React.FC<ISBButton> = ({
@@ -29,6 +30,7 @@ const SBButton: React.FC<ISBButton> = ({
   onClick,
   disabled,
   tempDisableOnClick,
+  style,
 }: ISBButton) => {
   const [tempDisable, setTempDisable] = useState(false);
   const ref = useRef((0 as unknown) as ReturnType<typeof setTimeout>);
@@ -59,6 +61,7 @@ const SBButton: React.FC<ISBButton> = ({
           }
         }
       }}
+      style={style}
     >
       {children}
     </span>
