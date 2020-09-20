@@ -170,6 +170,9 @@ const Home: React.FC = () => {
                   <SBButton
                     onClick={() => {
                       history.push(`/game/lobby/${game.id}`);
+                      if (game.numPlayers === 4) {
+                        firebase.spectateGame(game.id, username);
+                      }
                     }}
                     outline
                     color={color}

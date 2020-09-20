@@ -53,6 +53,7 @@ export interface Round {
 export interface Game {
   name: string;
   players: string[];
+  spectators: string[];
   playerInfo: Record<string, PlayerInfo>;
   phase: Phase;
   winBid: Bid | null;
@@ -65,4 +66,8 @@ export interface Game {
   currRound: number;
   rounds: Record<number, Round>;
   host: string;
+}
+
+export interface DefaultParams {
+  id: string;
 }

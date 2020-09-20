@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { Row, Col, Button, Badge, Modal, Container } from 'react-bootstrap';
 import { range } from 'lodash';
@@ -17,10 +17,18 @@ const GameLobby: React.FC = () => {
   const firebase = useFirebase();
   const { id } = useParams();
   const { game, error: gameError } = useGame(id);
-  const { players, host } = game;
+  const { players, host, spectators } = game;
 
   const auth = useAuth();
   const authUser = auth.state.authUser || { displayName: '' };
+
+  const [showChangeHostModal, setShowChangeHostModal] = useState(false);
+
+  const isSpectator = useMemo(
+    () =>
+      authUser?.displayName && spectators.some(s => s === authUser.displayName),
+    [authUser, spectators]
+  );
 
   const currUserGameInfo = useMemo(() => {
     if (game?.playerInfo && authUser?.displayName) {
@@ -57,7 +65,7 @@ const GameLobby: React.FC = () => {
 
   return (
     <Container className={styles.GameLobby} data-testid="GameLobby">
-      <Modal show={gameError === 'no-game'}>
+      <Modal show={gameError === 'no-game'} onHide={undefined}>
         <Modal.Header>Game Deleted</Modal.Header>
         <Modal.Footer>
           <Button
@@ -72,13 +80,40 @@ const GameLobby: React.FC = () => {
         </Modal.Footer>
       </Modal>
 
+      <Modal
+        show={showChangeHostModal}
+        onHide={() => setShowChangeHostModal(false)}
+      >
+        <Modal.Header>Change Host</Modal.Header>
+        <Modal.Body>
+          <h5 className="mb-4">Select new host</h5>
+          <div className="m-3">
+            {[...players, ...spectators]
+              .filter(user => user !== authUser.displayName)
+              .map(user => (
+                <SBButton
+                  onClick={() => {
+                    firebase.changeHost(id, user);
+                    setShowChangeHostModal(false);
+                  }}
+                  outline
+                  color="cyan"
+                  key={user}
+                >
+                  {user}
+                </SBButton>
+              ))}
+          </div>
+        </Modal.Body>
+      </Modal>
+
       <div className={styles.title}>
         <div className={styles.gameName}>{game?.name || id}</div>
         <div className={styles.phase}>Lobby</div>
       </div>
       <Row>
         <Col sm={2} className={styles.left}>
-          {!currUserGameInfo ? (
+          {!isSpectator ? (
             <SBButton
               outline
               color="cyan"
@@ -116,22 +151,32 @@ const GameLobby: React.FC = () => {
             </SBButton>
           )}
           {host === authUser.displayName && (
-            <SBButton
-              color="green"
-              outline
-              disabled={
-                players.length !== 4 ||
-                teamAPlayers.length !== teamBPlayers.length
-              }
-              onClick={() => firebase.startBidding(id)}
-              className="mt-3"
-            >
-              <FontAwesomeIcon icon="play" className="mr-2" />
-              START GAME
-            </SBButton>
+            <>
+              <SBButton
+                color="yellow"
+                outline
+                onClick={() => setShowChangeHostModal(true)}
+                className="mt-3"
+              >
+                CHANGE HOST
+              </SBButton>
+              <SBButton
+                color="green"
+                outline
+                disabled={
+                  players.length !== 4 ||
+                  teamAPlayers.length !== teamBPlayers.length
+                }
+                onClick={() => firebase.startBidding(id)}
+                className="mt-3"
+              >
+                <FontAwesomeIcon icon="play" className="mr-2" />
+                START GAME
+              </SBButton>
+            </>
           )}
         </Col>
-        <Col sm={8} className={styles.right}>
+        <Col sm={7} className={styles.right}>
           <div className={styles.teamA}>
             <div className={styles.teamTitle}>Red Team</div>
             <div className={styles.players}>
@@ -206,6 +251,40 @@ const GameLobby: React.FC = () => {
                   {!currUserGameInfo ? 'JOIN' : 'SWITCH'}
                 </SBButton>
               )}
+          </div>
+        </Col>
+        <Col sm={3}>
+          <div className={styles.right}>
+            <div className={styles.spectators}>
+              <div className={styles.teamTitle}>Spectators</div>
+              <div className={styles.players}>
+                {game?.spectators.map((username: string) => (
+                  <p key={username}>
+                    {username}
+                    {username === host && (
+                      <Badge className="mx-2" variant="secondary" pill>
+                        Host
+                      </Badge>
+                    )}
+                  </p>
+                ))}
+              </div>
+              {!isSpectator && (
+                <SBButton
+                  outline
+                  color="white"
+                  onClick={() => {
+                    if (authUser.displayName) {
+                      firebase.spectateGame(id, authUser.displayName);
+                    }
+                  }}
+                  className="float-right"
+                  style={{ alignSelf: 'center' }}
+                >
+                  SPECTATE
+                </SBButton>
+              )}
+            </div>
           </div>
         </Col>
       </Row>

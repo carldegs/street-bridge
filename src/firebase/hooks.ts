@@ -61,6 +61,7 @@ export const useGame = (
     currRound: 0,
     rounds: [],
     host: '',
+    spectators: [],
   });
   const [error, setError] = useState('');
   const { setAuthUserGame } = useAuth();

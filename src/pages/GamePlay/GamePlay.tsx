@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import cx from 'classnames';
 import { useParams, useHistory } from 'react-router-dom';
 import { Col, Row, Modal } from 'react-bootstrap';
@@ -9,18 +9,20 @@ import { useGame } from '../../firebase/hooks';
 import { useFirebase } from '../../firebase/useFirebase';
 import { useAuth } from '../../store/useAuth';
 import Cards from '../../components/Cards/Cards';
-import { Card, BidSuit, Phase } from '../../models';
+import { Card, BidSuit, Phase, DefaultParams } from '../../models';
 import CardComponent from '../../components/CardComponent/CardComponent';
 import SBButton from '../../components/SBButton/SBButton';
 import { getSuitString, getCardColor } from '../../utils/cards';
 import RoundsSummary from '../../components/RoundsSummary/RoundsSummary';
+
+import PlayerListModal from '../../components/PlayerListModal/PlayerListModal';
 
 import styles from './GamePlay.module.scss';
 import useGameDetails from './useGameDetails';
 
 const GamePlay: React.FC = () => {
   const history = useHistory();
-  const { id } = useParams();
+  const { id } = useParams<DefaultParams>();
   const { game, error: gameError } = useGame(id);
   const playersTable = useGameDetails(id);
   const firebase = useFirebase();
@@ -29,14 +31,27 @@ const GamePlay: React.FC = () => {
   const [showStopModal, setShowStopModal] = useState(false);
   const [showOptionsModal, setShowOptionsModal] = useState(false);
   const [showRecapModal, setShowRecapModal] = useState(false);
+  const [showPlayersModal, setShowPlayersModal] = useState(false);
+  const [spectatedPlayer, setSpectatedPlayer] = useState('');
+  const [autoSpectate, setAutoSpectate] = useState(true);
 
   const cards: Card[] = useMemo(() => {
     if (authUser.displayName) {
-      const unsortedCards = game?.playerInfo[authUser.displayName]?.cards || [];
+      const unsortedCards =
+        game?.playerInfo[
+          playersTable.isSpectator ? spectatedPlayer : authUser.displayName
+        ]?.cards || [];
+
       return sortBy(unsortedCards, ['suit', 'value']);
     }
     return [];
-  }, [game, authUser]);
+  }, [game, authUser, playersTable.isSpectator, spectatedPlayer]);
+
+  useEffect(() => {
+    if (playersTable.isSpectator && autoSpectate && playersTable.currPlayer) {
+      setSpectatedPlayer(playersTable.currPlayer);
+    }
+  }, [autoSpectate, playersTable.isSpectator, playersTable.currPlayer]);
 
   return (
     <div className={styles.GamePlay}>
@@ -53,6 +68,11 @@ const GamePlay: React.FC = () => {
           </SBButton>
         </Modal.Footer>
       </Modal>
+      <PlayerListModal
+        show={showPlayersModal}
+        onHide={() => setShowPlayersModal(false)}
+        game={game}
+      />
       <Modal show={showStopModal} onHide={() => setShowStopModal(false)}>
         <Modal.Header closeButton>Stop Game</Modal.Header>
         <Modal.Body>Are you sure you want to stop the game?</Modal.Body>
@@ -197,12 +217,39 @@ const GamePlay: React.FC = () => {
             color="cyan"
             className="mt-3"
             onClick={() => {
+              setShowPlayersModal(true);
+              setShowOptionsModal(false);
+            }}
+          >
+            PLAYERS
+          </SBButton>
+          <SBButton
+            outline
+            color="cyan"
+            className="mt-3"
+            onClick={() => {
               setShowOptionsModal(false);
               setShowRecapModal(true);
             }}
           >
             RECAP
           </SBButton>
+          {playersTable.isSpectator && !playersTable.isHost && (
+            <SBButton
+              outline
+              color="red"
+              onClick={() => {
+                auth.setAuthUserGame(null);
+                if (authUser.displayName) {
+                  firebase.leaveGame(id, authUser.displayName);
+                }
+                history.push('/home');
+              }}
+              className="mt-3"
+            >
+              BACK TO LOBBY
+            </SBButton>
+          )}
           {playersTable.isHost && (
             <SBButton
               outline
@@ -423,22 +470,31 @@ const GamePlay: React.FC = () => {
       </Row>
       <Row className="w-100">
         <Col>
-          {!playersTable.isSpectator && (
-            <Cards
-              cards={cards}
-              disabled={
-                playersTable.currPlayer !== authUser.displayName ||
-                !!playersTable.currPlayerCard
+          <Cards
+            cards={cards}
+            disabled={
+              (playersTable.currPlayer !== authUser.displayName ||
+                !!playersTable.currPlayerCard) &&
+              !playersTable.isSpectator
+            }
+            onClick={card => {
+              if (authUser.displayName && !playersTable.isSpectator) {
+                firebase.playCard(id, authUser.displayName, card);
               }
-              onClick={card => {
-                if (authUser.displayName) {
-                  firebase.playCard(id, authUser.displayName, card);
-                }
-              }}
-              isFirstPlayer={playersTable.isFirstPlayer}
-              roundSuit={playersTable.roundSuit}
-            />
-          )}
+            }}
+            isFirstPlayer={playersTable.isFirstPlayer}
+            roundSuit={playersTable.roundSuit}
+            isSpectating={playersTable.isSpectator}
+            onSpectatedPlayerClick={(player: string) => {
+              setSpectatedPlayer(player);
+            }}
+            onAutoSpectateClick={() => {
+              setAutoSpectate(!autoSpectate);
+            }}
+            spectatedPlayer={spectatedPlayer}
+            autoSpectate={autoSpectate}
+            players={game.players}
+          />
         </Col>
       </Row>
       <div className={styles.settings}>

@@ -16,6 +16,7 @@ import Cards from '../../components/Cards/Cards';
 import { useAuth } from '../../store/useAuth';
 
 import styles from './GameBid.module.scss';
+import PlayerListModal from '../../components/PlayerListModal/PlayerListModal';
 
 const getColor = (team: number): 'Red' | 'Blue' =>
   team === 0 ? 'Red' : 'Blue';
@@ -31,6 +32,8 @@ const GameBid: React.FC = () => {
   const [bidSuit, setBidSuit] = useState<BidSuit | null>(null);
   const [showOptionsModal, setShowOptionsModal] = useState(false);
   const [showPlayersModal, setShowPlayersModal] = useState(false);
+  const [spectatedPlayer, setSpectatedPlayer] = useState('');
+  const [autoSpectate, setAutoSpectate] = useState(true);
 
   const { currBid, currBidTeam, scoreToWin, currPlayer, bids } = useMemo(() => {
     const currBid = game.winBid;
@@ -80,14 +83,6 @@ const GameBid: React.FC = () => {
     };
   }, [currBid, bidValue]);
 
-  const cards: Card[] = useMemo(() => {
-    if (authUser.displayName) {
-      const unsortedCards = game?.playerInfo[authUser.displayName]?.cards || [];
-      return sortBy(unsortedCards, ['suit', 'value']);
-    }
-    return [];
-  }, [game, authUser]);
-
   const isAuthUserAPlayer = useMemo(() => {
     return !!(
       game?.playerInfo &&
@@ -95,6 +90,18 @@ const GameBid: React.FC = () => {
       game?.playerInfo[authUser.displayName]
     );
   }, [game, authUser]);
+
+  const cards: Card[] = useMemo(() => {
+    if (authUser.displayName) {
+      const unsortedCards =
+        game?.playerInfo[
+          isAuthUserAPlayer ? authUser.displayName : spectatedPlayer
+        ]?.cards || [];
+
+      return sortBy(unsortedCards, ['suit', 'value']);
+    }
+    return [];
+  }, [game, authUser, isAuthUserAPlayer, spectatedPlayer]);
 
   useEffect(() => {
     if (bidValue === null || !validBids.some(bid => bid === bidValue)) {
@@ -107,6 +114,12 @@ const GameBid: React.FC = () => {
       setBidSuit(validSuits[0] ? validSuits[0].value : BidSuit.none);
     }
   }, [validSuits, bidSuit]);
+
+  useEffect(() => {
+    if (!isAuthUserAPlayer && autoSpectate) {
+      setSpectatedPlayer(currPlayer);
+    }
+  }, [autoSpectate, isAuthUserAPlayer, currPlayer]);
 
   return (
     <div className={styles.GameBid}>
@@ -123,34 +136,11 @@ const GameBid: React.FC = () => {
           </SBButton>
         </Modal.Footer>
       </Modal>
-      <Modal show={showPlayersModal} onHide={() => setShowPlayersModal(false)}>
-        <Modal.Header closeButton />
-        <Modal.Body className="d-flex flex-column align-items-center justify-content-center mb-4">
-          <span
-            style={{ fontSize: '24px', marginTop: '-36px' }}
-            className="mb-2 font-weight-bold"
-          >
-            PLAYERS
-          </span>
-          {!!game?.players &&
-            !!game?.playerInfo &&
-            game.players
-              .map(player => game.playerInfo[player])
-              .map(playerInfo => (
-                <div
-                  className={cx(
-                    'mt-1',
-                    'font-weight-bold',
-                    styles[`text${playerInfo.team === 0 ? 'Red' : 'Blue'}`]
-                  )}
-                  style={{ fontSize: '20px' }}
-                  key={playerInfo.username}
-                >
-                  {playerInfo.username}
-                </div>
-              ))}
-        </Modal.Body>
-      </Modal>
+      <PlayerListModal
+        show={showPlayersModal}
+        onHide={() => setShowPlayersModal(false)}
+        game={game}
+      />
       <Modal
         size="sm"
         show={showOptionsModal}
@@ -174,7 +164,7 @@ const GameBid: React.FC = () => {
           >
             PLAYERS
           </SBButton>
-          {!isAuthUserAPlayer && (
+          {!isAuthUserAPlayer && authUser?.displayName !== game?.host && (
             <SBButton
               outline
               color="cyan"
@@ -408,7 +398,19 @@ const GameBid: React.FC = () => {
           <div className={styles.subtitle}>Score to Win</div>
         </Col>
       </Row>
-      <Cards cards={cards} />
+      <Cards
+        cards={cards}
+        isSpectating={!isAuthUserAPlayer}
+        players={game.players}
+        onSpectatedPlayerClick={(player: string) => {
+          setSpectatedPlayer(player);
+        }}
+        onAutoSpectateClick={() => {
+          setAutoSpectate(!autoSpectate);
+        }}
+        spectatedPlayer={spectatedPlayer}
+        autoSpectate={autoSpectate}
+      />
       <div className={styles.settings}>
         {!isAuthUserAPlayer && (
           <div className={cx(styles.spectatorText, 'mr-3')}>Spectating</div>

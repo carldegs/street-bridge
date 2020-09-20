@@ -122,7 +122,7 @@ const SBNavbar: React.FC<ISBNavbar> = ({ children, title }: ISBNavbar) => {
                     newPassword
                   )
                   .then(() => setShowResetPWModal(false))
-                  .catch(err => {
+                  .catch((err: any) => {
                     setPasswordError(err.message);
                     setAllowResetPassword(true);
                   });
