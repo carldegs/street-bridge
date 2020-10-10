@@ -14,13 +14,12 @@ import CardComponent from '../../components/CardComponent/CardComponent';
 import SBButton from '../../components/SBButton/SBButton';
 import { getSuitString, getCardColor } from '../../utils/cards';
 import RoundsSummary from '../../components/RoundsSummary/RoundsSummary';
-
 import PlayerListModal from '../../components/PlayerListModal/PlayerListModal';
+import GameStoppedModal from '../../components/GameStoppedModal/GameStoppedModal';
+import StopGameModal from '../../components/StopGameModal/StopGameModal';
 
 import styles from './GamePlay.module.scss';
 import useGameDetails from './useGameDetails';
-import GameStoppedModal from '../../components/GameStoppedModal/GameStoppedModal';
-import StopGameModal from '../../components/StopGameModal/StopGameModal';
 
 const GamePlay: React.FC = () => {
   const history = useHistory();

@@ -14,11 +14,10 @@ import SBButton from '../../components/SBButton/SBButton';
 import { toBidsArray, getScoreToWin } from '../../utils/bids';
 import Cards from '../../components/Cards/Cards';
 import { useAuth } from '../../store/useAuth';
-
 import PlayerListModal from '../../components/PlayerListModal/PlayerListModal';
+import GameStoppedModal from '../../components/GameStoppedModal/GameStoppedModal';
 
 import styles from './GameBid.module.scss';
-import GameStoppedModal from '../../components/GameStoppedModal/GameStoppedModal';
 
 const getColor = (team: number): 'Red' | 'Blue' =>
   team === 0 ? 'Red' : 'Blue';
