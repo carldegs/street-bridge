@@ -357,6 +357,8 @@ const GameBid: React.FC = () => {
                     outline
                     color="green"
                     tempDisableOnClick={1500}
+                    className="w-100 ml-3"
+                    style={{ textAlign: 'center' }}
                     onClick={() => {
                       if (
                         authUser.displayName &&

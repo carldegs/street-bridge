@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFirebase } from '../../firebase/useFirebase';
 import { useGame } from '../../firebase/hooks';
 import SBButton from '../../components/SBButton/SBButton';
-import { Phase } from '../../models';
+import { DefaultParams, Phase } from '../../models';
 import { useAuth } from '../../store/useAuth';
 
 import styles from './GameLobby.module.scss';
@@ -15,7 +15,7 @@ import styles from './GameLobby.module.scss';
 const GameLobby: React.FC = () => {
   const history = useHistory();
   const firebase = useFirebase();
-  const { id } = useParams();
+  const { id } = useParams<DefaultParams>();
   const { game, error: gameError } = useGame(id);
   const { players, host, spectators } = game;
 
@@ -113,7 +113,7 @@ const GameLobby: React.FC = () => {
       </div>
       <Row>
         <Col sm={2} className={styles.left}>
-          {!isSpectator ? (
+          {!isSpectator && (
             <SBButton
               outline
               color="cyan"
@@ -124,39 +124,39 @@ const GameLobby: React.FC = () => {
             >
               BACK TO LOBBY
             </SBButton>
-          ) : (
-            <SBButton
-              outline
-              color="cyan"
-              onClick={() => {
-                firebase.leaveGame(id, authUser?.displayName || '');
-                auth.setAuthUserGame(null);
-                history.push('/home');
-              }}
-            >
-              LEAVE GAME
-            </SBButton>
           )}
-          {host === authUser.displayName && (
-            <SBButton
-              outline
-              color="cyan"
-              onClick={() => {
-                firebase.deleteGame(id);
-                auth.setAuthUserGame(null);
-              }}
-              className="mt-3"
-            >
-              DELETE GAME
-            </SBButton>
-          )}
+          <SBButton
+            outline
+            color="cyan"
+            onClick={() => {
+              firebase.leaveGame(id, authUser?.displayName || '');
+              auth.setAuthUserGame(null);
+              history.push('/home');
+            }}
+            className="mt-3"
+          >
+            LEAVE GAME
+          </SBButton>
           {host === authUser.displayName && (
             <>
+              <div className="mt-4 font-weight-bold">SETTINGS</div>
+              <SBButton
+                outline
+                color="cyan"
+                onClick={() => {
+                  firebase.deleteGame(id);
+                  auth.setAuthUserGame(null);
+                }}
+                className="mt-3"
+              >
+                DELETE GAME
+              </SBButton>
               <SBButton
                 color="yellow"
                 outline
                 onClick={() => setShowChangeHostModal(true)}
                 className="mt-3"
+                disabled={players.length + spectators.length <= 1}
               >
                 CHANGE HOST
               </SBButton>
