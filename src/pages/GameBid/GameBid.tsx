@@ -18,6 +18,7 @@ import { useAuth } from '../../store/useAuth';
 import PlayerListModal from '../../components/PlayerListModal/PlayerListModal';
 
 import styles from './GameBid.module.scss';
+import GameStoppedModal from '../../components/GameStoppedModal/GameStoppedModal';
 
 const getColor = (team: number): 'Red' | 'Blue' =>
   team === 0 ? 'Red' : 'Blue';
@@ -124,19 +125,13 @@ const GameBid: React.FC = () => {
 
   return (
     <div className={styles.GameBid}>
-      <Modal show={gameError === 'no-game' && game.phase !== Phase.post}>
-        <Modal.Header>Game Stopped</Modal.Header>
-        <Modal.Footer>
-          <SBButton
-            onClick={() => {
-              auth.setAuthUserGame(null);
-              history.push('/home');
-            }}
-          >
-            Back to Lobby
-          </SBButton>
-        </Modal.Footer>
-      </Modal>
+      <GameStoppedModal
+        show={gameError === 'no-game' && game.phase !== Phase.post}
+        onClick={() => {
+          auth.setAuthUserGame(null);
+          history.push('/home');
+        }}
+      />
       <PlayerListModal
         show={showPlayersModal}
         onHide={() => setShowPlayersModal(false)}

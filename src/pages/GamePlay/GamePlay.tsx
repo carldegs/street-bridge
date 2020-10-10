@@ -19,6 +19,8 @@ import PlayerListModal from '../../components/PlayerListModal/PlayerListModal';
 
 import styles from './GamePlay.module.scss';
 import useGameDetails from './useGameDetails';
+import GameStoppedModal from '../../components/GameStoppedModal/GameStoppedModal';
+import StopGameModal from '../../components/StopGameModal/StopGameModal';
 
 const GamePlay: React.FC = () => {
   const history = useHistory();
@@ -55,40 +57,26 @@ const GamePlay: React.FC = () => {
 
   return (
     <div className={styles.GamePlay}>
-      <Modal show={gameError === 'no-game' && game.phase !== Phase.post}>
-        <Modal.Header>Game Stopped</Modal.Header>
-        <Modal.Footer>
-          <SBButton
-            onClick={() => {
-              auth.setAuthUserGame(null);
-              history.push('/home');
-            }}
-          >
-            Back to Lobby
-          </SBButton>
-        </Modal.Footer>
-      </Modal>
+      <GameStoppedModal
+        show={gameError === 'no-game' && game.phase !== Phase.post}
+        onClick={() => {
+          auth.setAuthUserGame(null);
+          history.push('/home');
+        }}
+      />
       <PlayerListModal
         show={showPlayersModal}
         onHide={() => setShowPlayersModal(false)}
         game={game}
       />
-      <Modal show={showStopModal} onHide={() => setShowStopModal(false)}>
-        <Modal.Header closeButton>Stop Game</Modal.Header>
-        <Modal.Body>Are you sure you want to stop the game?</Modal.Body>
-        <Modal.Footer>
-          <SBButton onClick={() => setShowStopModal(false)}>CANCEL</SBButton>
-          <SBButton
-            color="red"
-            onClick={() => {
-              firebase.deleteGame(id);
-              auth.setAuthUserGame(null);
-            }}
-          >
-            STOP GAME
-          </SBButton>
-        </Modal.Footer>
-      </Modal>
+      <StopGameModal
+        show={showStopModal}
+        onHide={() => setShowStopModal(false)}
+        onStopClick={() => {
+          firebase.deleteGame(id);
+          auth.setAuthUserGame(null);
+        }}
+      />
       <Modal size="xl" show={game.phase === Phase.post}>
         <Modal.Body className="d-flex flex-column justify-content-center">
           <Row>
