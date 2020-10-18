@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react';
 import cx from 'classnames';
 
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Table } from 'react-bootstrap';
 
 import { Round, PlayerInfo, Card } from '../../models';
 import CardComponent from '../CardComponent/CardComponent';
@@ -32,37 +32,47 @@ const RoundsSummary: React.FC<IRoundsSummary> = ({
 
   return (
     <div className={styles.RoundsSummary}>
-      <Row style={{ fontWeight: 'bold' }} className={styles.row}>
-        <Col>Players</Col>
-        {roundsArr.map((round, i) => (
-          <Col className="d-flex justify-content-center" key={i}>
-            {i + 1}
-          </Col>
-        ))}
-      </Row>
-      {playerNames.map(name => (
-        <Row key={name} className={styles.row}>
-          <Col
-            className={cx(
-              'd-flex flex-column justify-content-center',
-              styles[
-                `text${players && players[name].team === 0 ? 'Red' : 'Blue'}`
-              ]
-            )}
-          >
-            {name}
-          </Col>
-          {roundsArr.map((round, i) => (
-            <Col key={`${name}-${i}`} className="d-flex justify-content-center">
-              <CardComponent
-                card={round[name] as Card}
-                disabled={round.winningPlayer !== name}
-                small
-              />
-            </Col>
+      <Table style={{ color: 'white' }} striped hover responsive borderless>
+        <thead>
+          <tr style={{ fontWeight: 'bold' }}>
+            <th>Players</th>
+            {roundsArr.map((round, i) => (
+              <th style={{ textAlign: 'center' }} key={i}>
+                {i + 1}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {playerNames.map(name => (
+            <tr key={name} style={{ height: '72px' }}>
+              <td
+                className={
+                  styles[
+                    `text${
+                      players && players[name].team === 0 ? 'Red' : 'Blue'
+                    }`
+                  ]
+                }
+                style={{ verticalAlign: 'middle' }}
+              >
+                {name}
+              </td>
+              {roundsArr.map((round, i) => (
+                <td key={`${name}-${i}`}>
+                  <div style={{ margin: 'auto', width: 'fit-content' }}>
+                    <CardComponent
+                      card={round[name] as Card}
+                      disabled={round.winningPlayer !== name}
+                      small
+                    />
+                  </div>
+                </td>
+              ))}
+            </tr>
           ))}
-        </Row>
-      ))}
+        </tbody>
+      </Table>
     </div>
   );
 };
