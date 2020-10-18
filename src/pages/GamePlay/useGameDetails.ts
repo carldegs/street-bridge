@@ -14,7 +14,7 @@ interface PlayerTableDetail {
   card?: Card;
 }
 
-interface IGameDetail {
+export interface IGameDetail {
   left: PlayerTableDetail;
   right: PlayerTableDetail;
   top: PlayerTableDetail;
