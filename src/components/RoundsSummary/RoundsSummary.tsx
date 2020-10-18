@@ -1,8 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 import React, { useMemo } from 'react';
-import cx from 'classnames';
 
-import { Row, Col, Table } from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 
 import { Round, PlayerInfo, Card } from '../../models';
 import CardComponent from '../CardComponent/CardComponent';

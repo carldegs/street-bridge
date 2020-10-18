@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import cx from 'classnames';
 import { useParams, useHistory } from 'react-router-dom';
-import { Col, Row, Modal } from 'react-bootstrap';
+import { Col, Row, Modal, Badge } from 'react-bootstrap';
 import { sortBy } from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -19,7 +19,43 @@ import GameStoppedModal from '../../components/GameStoppedModal/GameStoppedModal
 import StopGameModal from '../../components/StopGameModal/StopGameModal';
 
 import styles from './GamePlay.module.scss';
-import useGameDetails from './useGameDetails';
+import useGameDetails, {
+  IGameDetail,
+  PlayerTableDetail,
+} from './useGameDetails';
+
+type TableSide = 'top' | 'left' | 'bottom' | 'right';
+
+const getTableStyles = (playersTable: IGameDetail): Record<string, boolean> => {
+  const sides = ['top', 'left', 'right', 'bottom'];
+  let classes: Record<string, boolean> = {};
+
+  sides.forEach(side => {
+    classes = {
+      ...classes,
+      [styles[
+        `${side}Box${
+          side === 'top' || side === 'bottom'
+            ? playersTable.teamColor
+            : playersTable.enemyColor
+        }`
+      ]]: playersTable[side as TableSide].isCurrPlayer,
+    };
+  });
+
+  return classes;
+};
+
+const showSideUsername = (playerDetail: PlayerTableDetail) => (
+  <>
+    {playerDetail.username}
+    {playerDetail.isHost && (
+      <Badge className="m-2" variant="secondary" pill>
+        Host
+      </Badge>
+    )}
+  </>
+);
 
 const GamePlay: React.FC = () => {
   const history = useHistory();
@@ -351,7 +387,7 @@ const GamePlay: React.FC = () => {
                   playersTable.top.isCurrPlayer,
               })}
             >
-              {playersTable.top.username}
+              {showSideUsername(playersTable.top)}
             </div>
           </div>
           <div className={styles.row2}>
@@ -361,21 +397,14 @@ const GamePlay: React.FC = () => {
                   playersTable.left.isCurrPlayer,
               })}
             >
-              {playersTable.left.username}
+              {showSideUsername(playersTable.left)}
             </div>
             <div
               className={cx(
                 styles.table,
                 styles[`border${playersTable.currPlayerColor}`],
                 {
-                  [styles[`topBox${playersTable.teamColor}`]]:
-                    playersTable.top.isCurrPlayer,
-                  [styles[`leftBox${playersTable.enemyColor}`]]:
-                    playersTable.left.isCurrPlayer,
-                  [styles[`rightBox${playersTable.enemyColor}`]]:
-                    playersTable.right.isCurrPlayer,
-                  [styles[`bottomBox${playersTable.teamColor}`]]:
-                    playersTable.bottom.isCurrPlayer,
+                  ...getTableStyles(playersTable),
                   [styles[
                     `win${playersTable.roundWinner}`
                   ]]: !!playersTable.roundWinner,
@@ -419,7 +448,7 @@ const GamePlay: React.FC = () => {
                   playersTable.right.isCurrPlayer,
               })}
             >
-              {playersTable.right.username}
+              {showSideUsername(playersTable.right)}
             </div>
           </div>
           <div className={styles.row3}>
@@ -429,7 +458,7 @@ const GamePlay: React.FC = () => {
                   playersTable.bottom.isCurrPlayer,
               })}
             >
-              {playersTable.bottom.username}
+              {showSideUsername(playersTable.bottom)}
             </div>
           </div>
         </Col>

@@ -5,13 +5,31 @@ import { useGame } from '../../firebase/hooks';
 import { Round, BidSuit, Card, Bid } from '../../models';
 import { getScoreToWin } from '../../utils/bids';
 
-type TeamColor = 'Red' | 'Blue';
+enum TeamColor {
+  Red = 'Red',
+  Blue = 'Blue',
+}
 
-interface PlayerTableDetail {
-  username: string;
-  color: TeamColor;
-  isCurrPlayer: boolean;
-  card?: Card;
+export class PlayerTableDetail {
+  public isCurrPlayer: boolean;
+
+  public isHost: boolean;
+
+  public card?: Card;
+
+  constructor(
+    public username: string,
+    public color: TeamColor,
+    currPlayer?: string,
+    host?: string,
+    currRound?: Round | null
+  ) {
+    this.isCurrPlayer = username === currPlayer;
+    this.isHost = username === host;
+    if (currRound) {
+      this.card = currRound[username] as Card;
+    }
+  }
 }
 
 export interface IGameDetail {
@@ -35,7 +53,8 @@ export interface IGameDetail {
   isSpectator: boolean;
 }
 
-const getTeamColor = (team: number) => (team === 0 ? 'Red' : 'Blue');
+const getTeamColor = (team: number): TeamColor =>
+  team === 0 ? TeamColor.Red : TeamColor.Blue;
 
 const useGameDetails = (id: string): IGameDetail => {
   const { game } = useGame(id);
@@ -44,31 +63,15 @@ const useGameDetails = (id: string): IGameDetail => {
     auth,
   ]);
   const [gameDetails, setGameDetails] = useState<IGameDetail>({
-    top: {
-      username: '',
-      color: 'Red',
-      isCurrPlayer: false,
-    },
-    right: {
-      username: '',
-      color: 'Blue',
-      isCurrPlayer: false,
-    },
-    left: {
-      username: '',
-      color: 'Blue',
-      isCurrPlayer: false,
-    },
-    bottom: {
-      username: '',
-      color: 'Red',
-      isCurrPlayer: false,
-    },
-    currPlayerColor: 'Red',
+    top: new PlayerTableDetail('', TeamColor.Red),
+    right: new PlayerTableDetail('', TeamColor.Blue),
+    left: new PlayerTableDetail('', TeamColor.Blue),
+    bottom: new PlayerTableDetail('', TeamColor.Red),
+    currPlayerColor: TeamColor.Red,
     isFirstPlayer: false,
     roundSuit: BidSuit.noTrump,
     isHost: false,
-    bidColor: 'Red',
+    bidColor: TeamColor.Red,
     isSpectator: false,
   });
 
@@ -146,39 +149,43 @@ const useGameDetails = (id: string): IGameDetail => {
       let roundWinner: TeamColor | undefined;
       if (currRound && currRound?.winningPlayer) {
         if (currRound?.winningTeam === 0) {
-          roundWinner = 'Red';
+          roundWinner = TeamColor.Red;
         } else if (currRound?.winningTeam === 1) {
-          roundWinner = 'Blue';
+          roundWinner = TeamColor.Blue;
         }
       }
 
       const isHost = displayName === host;
 
       setGameDetails({
-        left: {
-          username: leftPlayer,
-          color: enemyColor,
-          isCurrPlayer: leftPlayer === currPlayer,
-          card: currRound ? (currRound[leftPlayer] as Card) : undefined,
-        },
-        top: {
-          username: topPlayer,
-          color: teamColor,
-          isCurrPlayer: topPlayer === currPlayer,
-          card: currRound ? (currRound[topPlayer] as Card) : undefined,
-        },
-        right: {
-          username: rightPlayer,
-          color: enemyColor,
-          isCurrPlayer: rightPlayer === currPlayer,
-          card: currRound ? (currRound[rightPlayer] as Card) : undefined,
-        },
-        bottom: {
-          username: bottomPlayer,
-          color: teamColor,
-          isCurrPlayer: bottomPlayer === currPlayer,
-          card: currRound ? (currRound[bottomPlayer] as Card) : undefined,
-        },
+        left: new PlayerTableDetail(
+          leftPlayer,
+          enemyColor,
+          currPlayer,
+          host,
+          currRound
+        ),
+        top: new PlayerTableDetail(
+          topPlayer,
+          teamColor,
+          currPlayer,
+          host,
+          currRound
+        ),
+        right: new PlayerTableDetail(
+          rightPlayer,
+          enemyColor,
+          currPlayer,
+          host,
+          currRound
+        ),
+        bottom: new PlayerTableDetail(
+          bottomPlayer,
+          teamColor,
+          currPlayer,
+          host,
+          currRound
+        ),
         teamColor,
         enemyColor,
         currPlayer,
