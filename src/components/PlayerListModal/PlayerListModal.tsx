@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, ModalProps } from 'react-bootstrap';
+import { Badge, Modal, ModalProps } from 'react-bootstrap';
 import cx from 'classnames';
 
 import { Game } from '../../models';
@@ -39,6 +39,12 @@ const PlayerListModal: React.FC<IPlayerListModal> = ({
               key={playerInfo.username}
             >
               {playerInfo.username}
+
+              {playerInfo.username === game.host && (
+                <Badge className="mx-2" variant="secondary" pill>
+                  Host
+                </Badge>
+              )}
             </div>
           ))}
       {!!game.spectators?.length && (
@@ -53,6 +59,11 @@ const PlayerListModal: React.FC<IPlayerListModal> = ({
               key={spec}
             >
               {spec}
+              {spec === game.host && (
+                <Badge className="mx-2" variant="secondary" pill>
+                  Host
+                </Badge>
+              )}
             </div>
           ))}
         </>
