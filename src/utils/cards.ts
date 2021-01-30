@@ -1,6 +1,6 @@
 import { shuffle, chunk } from 'lodash';
 
-import { CardSuit, Card, BidSuit } from '../models';
+import { CardSuit, Card, BidSuit, CardValueLetters } from '../models';
 
 export const createCard = (
   suit: CardSuit,
@@ -15,7 +15,7 @@ export const createCard = (
 };
 
 export const isDeckMisdeal = (deck: Card[][]): boolean =>
-  deck.some(cards => !cards.some(card => card.value >= 9));
+  deck.some(cards => !cards.some(card => card.value > CardValueLetters.J));
 
 export const createSplitDeck = (): Card[][] => {
   let cards: Card[] = [];

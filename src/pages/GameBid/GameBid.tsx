@@ -111,12 +111,6 @@ const GameBid: React.FC = () => {
   }, [validBids, bidValue]);
 
   useEffect(() => {
-    if (bidSuit === null || !validSuits.some(suit => suit.value === bidSuit)) {
-      setBidSuit(validSuits[0] ? validSuits[0].value : BidSuit.none);
-    }
-  }, [validSuits, bidSuit]);
-
-  useEffect(() => {
     if (!isAuthUserAPlayer && autoSpectate) {
       setSpectatedPlayer(currPlayer);
     }
@@ -311,7 +305,10 @@ const GameBid: React.FC = () => {
                         [styles.itemSelected]: bv === bidValue,
                       })}
                       key={bv}
-                      onClick={() => setBidValue(bv)}
+                      onClick={() => {
+                        setBidValue(bv);
+                        setBidSuit(null);
+                      }}
                     >
                       {bv}
                     </div>
@@ -350,19 +347,21 @@ const GameBid: React.FC = () => {
                   <SBButton
                     outline
                     color="green"
+                    disabled={bidSuit === null}
                     tempDisableOnClick={1500}
                     className="w-100 ml-3"
                     style={{ textAlign: 'center' }}
-                    onClick={() => {
+                    onClick={async () => {
                       if (
                         authUser.displayName &&
                         bidValue !== null &&
                         bidSuit !== null
                       ) {
-                        firebase.setBid(id, authUser.displayName, {
+                        await firebase.setBid(id, authUser.displayName, {
                           value: bidValue,
                           suit: bidSuit,
                         });
+                        setBidSuit(null);
                       }
                     }}
                   >
