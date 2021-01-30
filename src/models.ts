@@ -22,6 +22,13 @@ export enum BidSuit {
   noTrump,
 }
 
+export enum CardValueLetters {
+  'J' = 9,
+  'Q',
+  'K',
+  'A',
+}
+
 export interface Card {
   suit: CardSuit;
   value: number;

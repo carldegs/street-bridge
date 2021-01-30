@@ -7,6 +7,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/react-fontawesome": "^0.1.10",
     "@hapi/joi": "^17.1.1",
+    "@hookform/resolvers": "^1.3.2",
     "@reduxjs/toolkit": "^1.3.6",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -35,6 +36,7 @@
     "react-bootstrap": "1.0.1",
     "react-csv": "^2.0.3",
     "react-dom": "^16.13.1",
+    "react-hook-form": "^6.14.2",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
     "typescript": "~3.7.2"
