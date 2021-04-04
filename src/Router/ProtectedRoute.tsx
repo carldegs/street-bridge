@@ -6,7 +6,7 @@ import startCase from 'lodash/startCase';
 import camelCase from 'lodash/camelCase';
 import { Spinner } from 'react-bootstrap';
 
-import SBNavbar from '../components/SBNavbar/SBNavbar';
+import SBNavbar from '../components/SBNavbar';
 import { Game, Phase } from '../models';
 
 import { RouteObject } from './model';
@@ -18,7 +18,7 @@ interface ITitlePage {
 
 const TitlePage: React.FC<ITitlePage> = ({ title, children }: ITitlePage) => {
   useEffect(() => {
-    document.title = `${title} - Analytics`;
+    document.title = `${title} - Street Bridge`;
   }, [title]);
 
   return children as React.ReactElement;

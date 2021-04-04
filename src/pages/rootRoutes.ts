@@ -1,12 +1,12 @@
 import { RouteObject } from '../Router/model';
 
-import Landing from './Landing/Landing';
-import Home from './Home/Home';
-import Signup from './Signup/Signup';
-import GameLobby from './GameLobby/GameLobby';
-import GameBid from './GameBid/GameBid';
-import GamePlay from './GamePlay/GamePlay';
-import Verification from './Verification/Verification';
+import Landing from './Landing';
+import Home from './Home';
+import Signup from './Signup';
+import GameLobby from './GameLobby';
+import GameBid from './GameBid';
+import GamePlay from './GamePlay';
+import Verification from './Verification';
 
 const ROOT_ROUTES: RouteObject[] = [
   {

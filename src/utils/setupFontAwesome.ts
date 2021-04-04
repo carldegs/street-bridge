@@ -8,6 +8,11 @@ import {
   faSpinner,
   faEllipsisH,
   faRobot,
+  faCaretDown,
+  faEye,
+  faEyeSlash,
+  faCog,
+  faCrown,
 } from '@fortawesome/free-solid-svg-icons';
 
 const setupFALibrary = (): void =>
@@ -19,7 +24,13 @@ const setupFALibrary = (): void =>
     faSpinner,
     faCodeBranch,
     faEllipsisH,
-    faRobot
+    faRobot,
+    faCaretDown,
+    faEye,
+    faEyeSlash,
+    faCog,
+    faCrown,
+    faCog
   );
 
 export default setupFALibrary;

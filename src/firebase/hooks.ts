@@ -52,9 +52,9 @@ export const useGame = (
     playerInfo: {},
     name: '',
     phase: Phase.lobby,
-    winBid: null,
-    winTeam: null,
-    winPlayer: null,
+    winBid: undefined,
+    winTeam: undefined,
+    winPlayer: undefined,
     currPlayer: 0,
     score: [0, 0],
     bids: [],
@@ -62,6 +62,7 @@ export const useGame = (
     rounds: [],
     host: '',
     spectators: [],
+    teamNames: ['', ''],
   });
   const [error, setError] = useState('');
   const { setAuthUserGame } = useAuth();

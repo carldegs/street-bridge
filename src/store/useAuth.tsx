@@ -26,10 +26,6 @@ export const authInitState: AuthState = {
   isAuthenticating: true,
 };
 
-// export const authActions = {
-//   setAuthUser: (authUser: firebase.User) => dispatch
-// }
-
 export const AuthContext = createContext({
   state: authInitState,
   dispatch: {} as React.Dispatch<[AuthActions, any]>,

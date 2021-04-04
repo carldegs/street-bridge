@@ -98,3 +98,28 @@ export const getCardColor = (suit?: CardSuit | BidSuit): string => {
       return 'Red';
   }
 };
+
+export const isCardPlayable = (
+  cards: Card[],
+  card: Card,
+  isFirstPlayer: boolean,
+  roundSuit: BidSuit,
+  disabled = false
+): boolean => {
+  if (disabled) {
+    return false;
+  }
+
+  if (isFirstPlayer) {
+    return true;
+  }
+
+  if (
+    cards.some(c => c.suit === ((roundSuit as unknown) as CardSuit)) &&
+    card.suit !== ((roundSuit as unknown) as CardSuit)
+  ) {
+    return false;
+  }
+
+  return true;
+};

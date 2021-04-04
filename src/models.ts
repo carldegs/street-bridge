@@ -63,9 +63,9 @@ export interface Game {
   spectators: string[];
   playerInfo: Record<string, PlayerInfo>;
   phase: Phase;
-  winBid: Bid | null;
-  winTeam: number | null;
-  winPlayer: string | null;
+  winBid?: Bid;
+  winTeam?: number;
+  winPlayer?: string;
   currPlayer: number;
   score: [number, number];
   bids: Record<number, PlayerBid>;
@@ -73,6 +73,7 @@ export interface Game {
   currRound: number;
   rounds: Record<number, Round>;
   host: string;
+  teamNames: [string, string];
 }
 
 export interface DefaultParams {

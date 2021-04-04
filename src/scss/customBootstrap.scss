@@ -46,10 +46,10 @@ body {
   font-size: 16px;
 }
 
-label {
-  color: $dark2;
-  opacity: 0.8;
-}
+// label {
+//   color: $dark2;
+//   opacity: 0.8;
+// }
 
 /* Importing bootstrap scss should be last */
 @import '~bootstrap/scss/bootstrap';

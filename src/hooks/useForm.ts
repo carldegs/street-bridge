@@ -35,7 +35,7 @@ export interface IUseForm<V = Record<string, any>> extends IState<V> {
   hasErrors: boolean;
 }
 
-const initializeErrors = (keys: any[]): Record<any, string> => {
+const initializeErrors = <V>(keys: any[]): StateErrors<V> => {
   let errors = {};
 
   keys.forEach(key => {
@@ -45,7 +45,7 @@ const initializeErrors = (keys: any[]): Record<any, string> => {
     };
   });
 
-  return errors;
+  return errors as StateErrors<V>;
 };
 
 const createFormReducer = <V>() => (
@@ -124,7 +124,7 @@ const createActions = <V>(dispatch?: React.Dispatch<IAction>) => ({
       : null,
 });
 
-const useForm = <V = Record<string, any>, R = any>(
+const useForm = <V = Record<string, any>>(
   initialValues: V,
   schema: Record<string, Joi.Schema>,
   submitCallback: (params: Partial<IState<V>>) => void
@@ -132,7 +132,7 @@ const useForm = <V = Record<string, any>, R = any>(
   const reducer = useMemo(() => createFormReducer<V>(), []);
   const [{ values, errors }, dispatch] = useReducer(reducer, {
     values: initialValues,
-    errors: initializeErrors(Object.keys(initialValues)),
+    errors: initializeErrors<V>(Object.keys(initialValues)),
   });
 
   const actions = useMemo(() => createActions<V>(dispatch), [dispatch]);

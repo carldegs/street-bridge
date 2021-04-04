@@ -1,0 +1,49 @@
+name: Firebase Preview Deploy
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@staging
+      - name: Install Dependencies
+        run: npm install
+      - name: Build
+        env:
+          REACT_APP_API_KEY: ${{ secrets.REACT_APP_API_KEY }}
+          REACT_APP_AUTH_DOMAIN: ${{ secrets.REACT_APP_AUTH_DOMAIN }}
+          REACT_APP_DATABASE_URL: ${{ secrets.REACT_APP_DATABASE_URL }}
+          REACT_APP_PROJECT_ID: ${{ secrets.REACT_APP_PROJECT_ID }}
+          REACT_APP_STORAGE_BUCKET: ${{ secrets.REACT_APP_STORAGE_BUCKET }}
+          REACT_APP_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_MESSAGING_SENDER_ID }}
+          REACT_APP_APP_ID: ${{ secrets.REACT_APP_APP_ID }}
+          REACT_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
+        run: npm run build
+      - name: Archive Production Artifact
+        uses: actions/upload-artifact@staging
+        with:
+          name: build
+          path: build
+  deploy:
+    name: Deploy Preview
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@staging
+      - name: Download Artifact
+        uses: actions/download-artifact@staging
+        with:
+          name: build
+          path: build
+      - name: Deploy to Firebase Preview
+        uses: w9jds/firebase-action@staging
+        with:
+          args: firebase hosting:channel:deploy staging
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}

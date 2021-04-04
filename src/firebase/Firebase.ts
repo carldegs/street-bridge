@@ -46,9 +46,7 @@ class Firebase {
     } else {
       this.auth = {} as app.auth.Auth;
       this.db = {} as app.firestore.Firestore;
-      this.games = {} as app.firestore.CollectionReference<
-        app.firestore.DocumentData
-      >;
+      this.games = {} as app.firestore.CollectionReference<app.firestore.DocumentData>;
       this.googleProvider = {} as app.auth.GoogleAuthProvider;
     }
   }
@@ -225,9 +223,9 @@ class Firebase {
           },
         },
         phase: Phase.lobby,
-        winBid: null,
-        winTeam: null,
-        winPlayer: null,
+        winBid: undefined,
+        winTeam: undefined,
+        winPlayer: undefined,
         currPlayer: 0,
         score: [0, 0],
         bids: [],
@@ -235,6 +233,7 @@ class Firebase {
         rounds: [],
         host: username,
         spectators: [],
+        teamNames: ['Team A', 'Team B'],
       };
       const res = await this.games.add({ ...game });
       return res.id;

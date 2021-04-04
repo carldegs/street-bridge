@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, Dispatch, useContext } from 'react';
+import React, { createContext, useReducer, useContext } from 'react';
 
 export interface GameState {
   name: string;
